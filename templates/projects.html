@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Tendering Project Entry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f4f7f6; /* Light gray background */
+        }
+        .main-content {
+            flex: 1; /* Allows main content to grow and push footer down */
+            padding-top: 20px; /* Space from header */
+            padding-bottom: 20px; /* Space from footer */
+        }
+        .navbar {
+            background-color: #28a745; /* Green color for the navbar */
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .navbar-nav .nav-link {
+            color: white !important;
+            margin-left: 20px;
+            font-size: 1.1rem;
+        }
+        .navbar-nav .nav-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            background-color: #343a40; /* Dark background for footer */
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            margin-top: auto; /* Push footer to the bottom */
+        }
+        /* Custom styles for the table container */
+        .card {
+            max-width: 1200px; /* Wider card for the table */
+            width: 95%;
+            margin: 20px auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            vertical-align: middle; /* Align text vertically in middle */
+            font-size: 0.9em; /* Slightly smaller font for table content */
+        }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8em;
+            line-height: 1.5;
+            border-radius: 0.2rem;
+        }
+        .status-badge {
+            padding: .35em .65em;
+            border-radius: .25rem;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            display: inline-block;
+        }
+        /* Status specific colors */
+        .status-Yet-to-Submit { background-color: #ffc107; color: #343a40; } /* Warning - Yellow */
+        .status-Submitted { background-color: #17a2b8; color: #fff; } /* Info - Teal */
+        .status-Awarded { background-color: #28a745; color: #fff; } /* Success - Green */
+        .status-Lost { background-color: #dc3545; color: #fff; } /* Danger - Red */
+        .status-Cancelled { background-color: #6c757d; color: #fff; } /* Secondary - Gray */
+        .status-On-Hold { background-color: #007bff; color: #fff; } /* Primary - Blue */
+        
+        .filter-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+        }
+        .filter-section .form-label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark w-100">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/dashboard">Tendering Project Entry</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/new_project">New Project Entry</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/projects_list">Projects</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                More
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/reports">Reports</a></li>
+                                <li><a class="dropdown-item" href="/analytics">Analytics</a></li>
+                                <li><a class="dropdown-item" href="/user_management">User Management</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <h2 class="text-center mb-4">All Project Entries</h2>
+
+            <div class="filter-section">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="searchQuery" class="form-label">Search</label>
+                        <input type="text" class="form-control" id="searchQuery" placeholder="Search by Project ID, Tender Name, Company, Client...">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="statusFilter" class="form-label">Filter by Status</label>
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="Yet to Submit">Yet to Submit</option>
+                            <option value="Submitted">Submitted</option>
+                            <option value="Awarded">Awarded</option>
+                            <option value="Lost">Lost</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="On Hold">On Hold</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="clientFilter" class="form-label">Filter by Client</label>
+                        <select class="form-select" id="clientFilter">
+                            <option value="">All Clients</option>
+                            </select>
+                    </div>
+                </div>
+                <div class="row g-3 mt-3">
+                    <div class="col-md-4">
+                        <label for="startDate" class="form-label">Entry Date From</label>
+                        <input type="date" class="form-control" id="startDate">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="endDate" class="form-label">Entry Date To</label>
+                        <input type="date" class="form-control" id="endDate">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="button" class="btn btn-primary w-100" onclick="applyFiltersAndSearch()">Apply Filters</button>
+                        <button type="button" class="btn btn-secondary w-100 ms-2" onclick="resetFilters()">Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped" id="projectsTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Project ID</th>
+                                <th>Tender Name</th>
+                                <th>Company Name</th>
+                                <th>Entry Date</th>
+                                <th>Status</th>
+                                <th>Client</th>
+                                <th>Est. Cost (INR)</th>
+                                <th>Work Order Value (INR)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectsTableBody">
+                            <tr>
+                                <td colspan="9" class="text-center">Loading projects...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Tendering Project Entry. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        let allProjects = []; // Store all projects fetched from the API
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchProjects(); // Initial fetch when the page loads
+
+            document.getElementById('searchQuery').addEventListener('input', applyFiltersAndSearch);
+            document.getElementById('statusFilter').addEventListener('change', applyFiltersAndSearch);
+            document.getElementById('clientFilter').addEventListener('change', applyFiltersAndSearch);
+        });
+
+        async function fetchProjects() {
+            try {
+                const response = await fetch('/api/projects/'); // Fetch all projects from your API
+                if (response.status === 401) {
+                    window.location.href = '/signin'; // Redirect to signin if not authenticated
+                    return;
+                }
+                const data = await response.json();
+                allProjects = data; // Store fetched projects
+                populateClientFilter(); // Populate client filter options based on fetched data
+                applyFiltersAndSearch(); // Render table with all projects initially
+            } catch (error) {
+                console.error('Error fetching projects:', error);
+                document.getElementById('projectsTableBody').innerHTML = `<tr><td colspan="9" class="text-center text-danger">Failed to load projects. Please try again.</td></tr>`;
+            }
+        }
+
+        function populateClientFilter() {
+            const clientFilter = document.getElementById('clientFilter');
+            clientFilter.innerHTML = '<option value="">All Clients</option>'; // Reset options
+
+            const clients = new Set(allProjects.map(project => project.name_of_client).filter(Boolean)); // Get unique clients
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client;
+                option.textContent = client;
+                clientFilter.appendChild(option);
+            });
+        }
+
+        window.applyFiltersAndSearch = () => {
+            const searchQuery = document.getElementById('searchQuery').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const clientFilter = document.getElementById('clientFilter').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            let filteredProjects = allProjects.filter(project => {
+                // Search query
+                const matchesSearch = !searchQuery || 
+                                      project.project_id.toLowerCase().includes(searchQuery) ||
+                                      project.tender_name.toLowerCase().includes(searchQuery) ||
+                                      project.company_name.toLowerCase().includes(searchQuery) ||
+                                      project.name_of_client.toLowerCase().includes(searchQuery);
+
+                // Status filter
+                const matchesStatus = !statusFilter || project.tender_status === statusFilter;
+
+                // Client filter
+                const matchesClient = !clientFilter || project.name_of_client === clientFilter;
+
+                // Date range filter
+                const entryDate = new Date(project.tender_entry_date);
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+
+                const matchesDate = (!start || entryDate >= start) && (!end || entryDate <= end);
+
+                return matchesSearch && matchesStatus && matchesClient && matchesDate;
+            });
+
+            renderTable(filteredProjects);
+        };
+
+        window.resetFilters = () => {
+            document.getElementById('searchQuery').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('clientFilter').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            applyFiltersAndSearch(); // Re-apply filters with cleared values
+        };
+
+        function renderTable(projectsToDisplay) {
+            const tableBody = document.getElementById('projectsTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            if (projectsToDisplay.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="9" class="text-center">No projects found.</td></tr>`;
+                return;
+            }
+
+            projectsToDisplay.forEach(project => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${project.project_id}</td>
+                    <td>${project.tender_name}</td>
+                    <td>${project.company_name}</td>
+                    <td>${project.tender_entry_date}</td>
+                    <td><span class="status-badge status-${project.tender_status.replace(/\s/g, '-') || 'default'}">${project.tender_status}</span></td>
+                    <td>${project.name_of_client}</td>
+                    <td>${project.tender_estimated_cost_inr ? project.tender_estimated_cost_inr.toLocaleString('en-IN') : 'N/A'}</td>
+                    <td>${project.work_order_value_inr ? project.work_order_value_inr.toLocaleString('en-IN') : 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" onclick="editProject('${project.project_id}')">Edit</button>
+                        <button class="btn btn-warning btn-sm" onclick="changeStatus('${project.project_id}')">Change Status</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProject('${project.project_id}')">Delete</button>
+                    </td>
+                `;
+            });
+        }
+
+        // --- Action Functions (now interacting with API) ---
+
+        window.editProject = (id) => {
+            window.location.href = `/edit_project/${id}`; // Redirect to the new edit page
+        };
+
+        window.changeStatus = async (id) => {
+            const newStatus = prompt(`Change status for ${id}. Enter new status (e.g., Yet to Submit, Submitted, Awarded, Lost, Cancelled, On Hold):`);
+            if (newStatus) {
+                try {
+                    const response = await fetch(`/api/projects/${id}?tender_status=${encodeURIComponent(newStatus)}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    if (response.ok) {
+                        alert(`Status for ${id} changed to ${newStatus} successfully!`);
+                        fetchProjects(); // Re-fetch all projects to update the table
+                    } else if (response.status === 401) {
+                         window.location.href = '/signin';
+                    }
+                    else {
+                        const errorData = await response.json();
+                        alert(`Failed to update status for ${id}: ${errorData.detail || response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error('Error changing status:', error);
+                    alert('Network error while changing status. Please try again.');
+                }
+            }
+        };
+
+        window.deleteProject = async (id) => {
+            if (confirm(`Are you sure you want to delete project ${id}? This action cannot be undone.`)) {
+                try {
+                    const response = await fetch(`/api/projects/${id}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        alert(`Project ${id} deleted successfully!`);
+                        fetchProjects(); // Re-fetch all projects to update the table
+                    } else if (response.status === 401) {
+                         window.location.href = '/signin';
+                    }
+                    else {
+                        const errorData = await response.json();
+                        alert(`Failed to delete project ${id}: ${errorData.detail || response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error('Error deleting project:', error);
+                    alert('Network error while deleting project. Please try again.');
+                }
+            }
+        };
+    </script>
+</body>
+</html>

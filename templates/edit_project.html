@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Project - Tendering Project Entry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f4f7f6; /* Light gray background */
+        }
+        .main-content {
+            flex: 1; /* Allows main content to grow and push footer down */
+            padding-top: 20px; /* Space from header */
+            padding-bottom: 20px; /* Space from footer */
+        }
+        .navbar {
+            background-color: #28a745; /* Green color for the navbar */
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .navbar-nav .nav-link {
+            color: white !important;
+            margin-left: 20px;
+            font-size: 1.1rem;
+        }
+        .navbar-nav .nav-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            background-color: #343a40; /* Dark background for footer */
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            margin-top: auto; /* Push footer to the bottom */
+        }
+        /* Custom styles for the form container */
+        .card {
+            max-width: 900px; /* Increased max-width for more fields */
+            width: 90%;
+            margin: 0 auto; /* Center the card */
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .response-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none; /* Hidden by default */
+        }
+        .response-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .response-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark w-100">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/dashboard">Tendering Project Entry</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/new_project">New Project Entry</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/projects_list">Projects</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                More
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/reports">Reports</a></li>
+                                <li><a class="dropdown-item" href="/analytics">Analytics</a></li>
+                                <li><a class="dropdown-item" href="/user_management">User Management</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="card">
+                <h2 class="text-center mb-4">Edit Project Entry: <span id="displayProjectId"></span></h2>
+                <div id="responseMessage" class="response-message"></div>
+
+                <form id="editProjectForm" enctype="multipart/form-data">
+                    <input type="hidden" id="projectIdHidden" name="project_id_hidden">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="project_id" class="form-label">Project ID</label>
+                            <input type="text" class="form-control" id="project_id" name="project_id" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tender_name" class="form-label">Tender Name</label>
+                            <input type="text" class="form-control" id="tender_name" name="tender_name" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="company_name" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="company_name" name="company_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tender_entry_date" class="form-label">Tender Entry Date</label>
+                            <input type="date" class="form-control" id="tender_entry_date" name="tender_entry_date" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tender_type" class="form-label">Tender Type</label>
+                            <select class="form-select" id="tender_type" name="tender_type" required>
+                                <option value="">Select Tender Type</option>
+                                <option value="Open Tender">Open Tender</option>
+                                <option value="Limited Tender">Limited Tender</option>
+                                <option value="Single Tender">Single Tender</option>
+                                <option value="e-Tender">e-Tender</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tender_status" class="form-label">Tender Status</label>
+                            <select class="form-select" id="tender_status" name="tender_status" required>
+                                <option value="">Select Status</option>
+                                <option value="Yet to Submit">Yet to Submit</option>
+                                <option value="Submitted">Submitted</option>
+                                <option value="Awarded">Awarded</option>
+                                <option value="Lost">Lost</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="On Hold">On Hold</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name_of_client" class="form-label">Name of Client</label>
+                            <input type="text" class="form-control" id="name_of_client" name="name_of_client" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tender_estimated_cost_inr" class="form-label">Tender Estimated Cost (INR)</label>
+                            <input type="number" class="form-control" id="tender_estimated_cost_inr" name="tender_estimated_cost_inr" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="emd_paid_inr" class="form-label">EMD Paid (INR)</label>
+                            <input type="number" class="form-control" id="emd_paid_inr" name="emd_paid_inr" step="0.01" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="performance_guarantee_submitted_inr" class="form-label">Performance Guarantee Submitted (INR)</label>
+                            <input type="number" class="form-control" id="performance_guarantee_submitted_inr" name="performance_guarantee_submitted_inr" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tender_fees_paid_inr" class="form-label">Tender Fees Paid (INR)</label>
+                            <input type="number" class="form-control" id="tender_fees_paid_inr" name="tender_fees_paid_inr" step="0.01">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="work_order_value_inr" class="form-label">Work Order Value (INR)</label>
+                            <input type="number" class="form-control" id="work_order_value_inr" name="work_order_value_inr" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tender_submission_date" class="form-label">Tender Submission Date</label>
+                            <input type="date" class="form-control" id="tender_submission_date" name="tender_submission_date">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tender_opening_date" class="form-label">Tender Opening Date</label>
+                            <input type="date" class="form-control" id="tender_opening_date" name="tender_opening_date">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="work_completion_date" class="form-label">Work Completion Date</label>
+                            <input type="date" class="form-control" id="work_completion_date" name="work_completion_date">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="contact_person" class="form-label">Contact Person</label>
+                            <input type="text" class="form-control" id="contact_person" name="contact_person">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="contact_number" class="form-label">Contact Number</label>
+                            <input type="tel" class="form-control" id="contact_number" name="contact_number">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="contact_email" class="form-label">Contact Email</label>
+                            <input type="email" class="form-control" id="contact_email" name="contact_email">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ref_tender_id" class="form-label">Reference Tender ID</label>
+                        <input type="text" class="form-control" id="ref_tender_id" name="ref_tender_id">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="attch_tender_document_path" class="form-label">Attach Tender Document (Current: <span id="currentDocument">None</span>)</label>
+                        <input type="file" class="form-control" id="attch_tender_document_path" name="attch_tender_document_path">
+                        <small class="form-text text-muted">Upload a new document to replace the current one.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Update Project</button>
+                    <a href="/projects_list" class="btn btn-secondary w-100 mt-2">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Tendering Project Entry. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('editProjectForm');
+            const responseMessageDiv = document.getElementById('responseMessage');
+            const displayProjectIdSpan = document.getElementById('displayProjectId');
+            const projectIdHiddenInput = document.getElementById('projectIdHidden');
+            const currentDocumentSpan = document.getElementById('currentDocument');
+
+            // Function to get project_id from URL
+            function getProjectIdFromUrl() {
+                const pathParts = window.location.pathname.split('/');
+                return pathParts[pathParts.length - 1];
+            }
+
+            const projectId = getProjectIdFromUrl();
+            if (!projectId) {
+                responseMessageDiv.classList.add('error');
+                responseMessageDiv.textContent = 'Error: Project ID not found in URL.';
+                responseMessageDiv.style.display = 'block';
+                return;
+            }
+
+            displayProjectIdSpan.textContent = projectId;
+            projectIdHiddenInput.value = projectId; // Set the hidden input for form submission
+
+            // Fetch existing project data
+            fetch(`/api/projects/${projectId}`) // You will need to add a GET /api/projects/{project_id} endpoint in main.txt
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = '/signin'; // Redirect to signin if not authenticated
+                        throw new Error('Unauthorized');
+                    }
+                    if (!response.ok) {
+                        throw new Error('Project not found or server error');
+                    }
+                    return response.json();
+                })
+                .then(projectData => {
+                    // Populate the form fields with existing data
+                    document.getElementById('project_id').value = projectData.project_id || '';
+                    document.getElementById('tender_name').value = projectData.tender_name || '';
+                    document.getElementById('company_name').value = projectData.company_name || '';
+                    document.getElementById('tender_entry_date').value = projectData.tender_entry_date || ''; // Dates are ISO format YYYY-MM-DD
+                    document.getElementById('tender_type').value = projectData.tender_type || '';
+                    document.getElementById('tender_status').value = projectData.tender_status || '';
+                    document.getElementById('name_of_client').value = projectData.name_of_client || '';
+                    document.getElementById('tender_estimated_cost_inr').value = projectData.tender_estimated_cost_inr || '';
+                    document.getElementById('emd_paid_inr').value = projectData.emd_paid_inr || '';
+                    document.getElementById('performance_guarantee_submitted_inr').value = projectData.performance_guarantee_submitted_inr || '';
+                    document.getElementById('tender_fees_paid_inr').value = projectData.tender_fees_paid_inr || '';
+                    document.getElementById('work_order_value_inr').value = projectData.work_order_value_inr || '';
+                    document.getElementById('tender_submission_date').value = projectData.tender_submission_date || '';
+                    document.getElementById('tender_opening_date').value = projectData.tender_opening_date || '';
+                    document.getElementById('work_completion_date').value = projectData.work_completion_date || '';
+                    document.getElementById('contact_person').value = projectData.contact_person || '';
+                    document.getElementById('contact_number').value = projectData.contact_number || '';
+                    document.getElementById('contact_email').value = projectData.contact_email || '';
+                    document.getElementById('ref_tender_id').value = projectData.ref_tender_id || '';
+                    document.getElementById('notes').value = projectData.notes || '';
+
+                    // Display current document path if available
+                    if (projectData.attch_tender_document_path) {
+                        const fileName = projectData.attch_tender_document_path.split('/').pop();
+                        currentDocumentSpan.innerHTML = `<a href="/static/${fileName}" target="_blank">${fileName}</a>`; // Assuming static files are served from /static
+                    } else {
+                        currentDocumentSpan.textContent = 'None';
+                    }
+
+                })
+                .catch(error => {
+                    console.error('Error fetching project data:', error);
+                    responseMessageDiv.classList.add('error');
+                    responseMessageDiv.textContent = `Failed to load project data: ${error.message}`;
+                    responseMessageDiv.style.display = 'block';
+                });
+
+            // Handle form submission for update
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault(); // Prevent default form submission
+                responseMessageDiv.style.display = 'none'; // Hide previous messages
+
+                const formData = new FormData(form);
+                // Remove the read-only project_id as it's passed in the URL path and hidden input
+                formData.delete('project_id'); 
+                
+                // The hidden input should be used for the URL parameter.
+                // It's also good practice to not rely on the hidden input, 
+                // but directly use the `projectId` variable obtained from the URL.
+
+                try {
+                    const response = await fetch(`/api/projects/edit/${projectId}`, {
+                        method: 'PUT',
+                        body: formData // FormData will correctly handle file uploads and other fields
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        responseMessageDiv.classList.remove('error');
+                        responseMessageDiv.classList.add('success');
+                        responseMessageDiv.textContent = result.message || 'Project updated successfully!';
+                        // Optionally redirect after a short delay
+                        setTimeout(() => {
+                             window.location.href = '/projects_list';
+                        }, 1500); 
+                    } else {
+                        responseMessageDiv.classList.remove('success');
+                        responseMessageDiv.classList.add('error');
+                        let errorMessage = 'Failed to update project.';
+                        if (result && result.detail) {
+                            if (Array.isArray(result.detail)) {
+                                errorMessage = result.detail.map(item => {
+                                    if (typeof item === 'object' && item !== null) {
+                                        return item.msg || item.message || item.detail || JSON.stringify(item);
+                                    }
+                                    return String(item);
+                                }).join('<br>');
+                            } else {
+                                errorMessage = String(result.detail);
+                            }
+                        }
+                        responseMessageDiv.innerHTML = errorMessage;
+                    }
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                    responseMessageDiv.classList.remove('success');
+                    responseMessageDiv.classList.add('error');
+                    responseMessageDiv.textContent = 'Network error or server unreachable. Please try again.';
+                }
+                responseMessageDiv.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

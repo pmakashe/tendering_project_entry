@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tendering Project Entry</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px; /* Adjusted max-width for better layout */
+            box-sizing: border-box;
+            margin-top: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group input[type="datetime-local"], /* Added for datetime-local */
+        .form-group input[type="file"],
+        .form-group select,
+        .form-group textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .form-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between; /* Distribute columns */
+        }
+        .form-column {
+            flex: 1;
+            min-width: 400px; /* Min width for each column before wrapping */
+        }
+        fieldset {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            background-color: #fcfcfc;
+        }
+        legend {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+            padding: 0 10px;
+            margin-left: 10px;
+            border-bottom: none;
+            width: auto;
+        }
+        .btn-submit {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+        .response-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            display: {% if error_message or success_message %}block{% else %}none{% endif %};
+        }
+        .response-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .response-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .required-asterisk {
+            color: red;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>New Tendering Project Entry</h2>
+        <div id="responseMessage" class="response-message {% if error_message %}error{% elif success_message %}success{% endif %}">
+            {% if error_message %}{{ error_message }}{% elif success_message %}{{ success_message }}{% endif %}
+        </div>
+        <form id="projectForm" method="POST" action="/projects/" enctype="multipart/form-data">
+            <div class="form-columns">
+                <div class="form-column">
+                    <fieldset>
+                        <legend>Project General Information</legend>
+                        <div class="form-group">
+                            <label for="project_id">Project ID:<span class="required-asterisk">*</span></label>
+                            <input type="text" id="project_id" name="project_id" value="{{ next_project_id }}" readonly required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tender_entry_date">Tender Entry Date and Time:<span class="required-asterisk">*</span></label>
+                            <input type="datetime-local" id="tender_entry_date" name="tender_entry_date_str" value="{{ current_datetime_str }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="project_name">Project Name:<span class="required-asterisk">*</span></label>
+                            <input type="text" id="project_name" name="project_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="company_name">Company Name:<span class="required-asterisk">*</span></label>
+                            <select id="company_name" name="company_name" required>
+                                <option value="">Select Company</option>
+                                <option value="UNIVASTU">UNIVASTU</option>
+                                <option value="UBILLP">UBILLP</option>
+                                <option value="Autofina Robotics">Autofina Robotics</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="name_of_client">Name of Client:<span class="required-asterisk">*</span></label>
+                            <input type="text" id="name_of_client" name="name_of_client" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State:<span class="required-asterisk">*</span></label>
+                            <select id="state" name="state" required>
+                                <option value="">Select State</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="project_type">Project Type:<span class="required-asterisk">*</span></label>
+                            <select id="project_type" name="project_type" required>
+                                <option value="">Select Type</option>
+                                <option value="Road">Road</option>
+                                <option value="Building">Building</option>
+                                <option value="Water Supply">Water Supply</option>
+                                <option value="Sports Complex">Sports Complex</option>
+                                <option value="Metro">Metro</option>
+                                <option value="Commercial">Commercial</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tender_id">Tender ID (Optional):</label>
+                            <input type="text" id="tender_id" name="tender_id">
+                        </div>
+                        <div class="form-group">
+                            <label for="attch_tender_document">Attach Tender Document (PDF/DOC):</label>
+                            <input type="file" id="attch_tender_document" name="attch_tender_document" accept=".pdf,.doc,.docx">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Other Details</legend>
+                        <div class="form-group">
+                            <label for="completion_period_month">Completion Period (Months):</label>
+                            <input type="number" id="completion_period_month" name="completion_period_month_str">
+                        </div>
+                        <div class="form-group">
+                            <label for="tender_opening_date">Tender Opening Date:</label>
+                            <input type="date" id="tender_opening_date" name="tender_opening_date_str">
+                        </div>
+                        <div class="form-group">
+                            <label for="pre_bid_meeting_date">Pre-Bid Meeting Date:</label>
+                            <input type="date" id="pre_bid_meeting_date" name="pre_bid_meeting_date_str">
+                        </div>
+                        <div class="form-group">
+                            <label for="clarifications_issued_date">Clarifications Issued Date:</label>
+                            <input type="date" id="clarifications_issued_date" name="clarifications_issued_date_str">
+                        </div>
+                        <div class="form-group">
+                            <label for="corrigendum_received_date">Corrigendum Received Date:</label>
+                            <input type="date" id="corrigendum_received_date" name="corrigendum_received_date_str">
+                        </div>
+                        <div class="form-group">
+                            <label for="emd_paid_inr">EMD Paid (INR):</label>
+                            <input type="number" id="emd_paid_inr" name="emd_paid_inr_str" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="emd_instrument_type">EMD Instrument Type:</label>
+                            <select id="emd_instrument_type" name="emd_instrument_type">
+                                <option value="">Select Type</option>
+                                <option value="Cash">Cash</option>
+                                <option value="BG">BG</option>
+                                <option value="FDR">FDR</option>
+                                <option value="DD">DD</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="emd_bg_details_bg_number">EMD BG Number:</label>
+                            <input type="text" id="emd_bg_details_bg_number" name="emd_bg_details_bg_number">
+                        </div>
+                        <div class="form-group">
+                            <label for="emd_bg_details_bank_name">EMD BG Bank Name:</label>
+                            <input type="text" id="emd_bg_details_bank_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="emd_bg_details_bg_expiry_date">EMD BG Expiry Date:</label>
+                            <input type="date" id="emd_bg_details_bg_expiry_date" name="emd_bg_details_bg_expiry_date_str">
+                        </div>
+                        <div class="form-group">
+                            <label for="emd_return_date">EMD Return Date:</label>
+                            <input type="date" id="emd_return_date" name="emd_return_date_str">
+                        </div>
+                        <div class="form-group">
+                            <label for="sd_required_percent">SD Required (%):</label>
+                            <input type="number" id="sd_required_percent" name="sd_required_percent_str" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="sd_required_inr">SD Required (INR):</label>
+                            <input type="number" id="sd_required_inr" name="sd_required_inr_str" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="sd_instrument_type">SD Instrument Type:</label>
+                            <select id="sd_instrument_type" name="sd_instrument_type">
+                                <option value="">Select Type</option>
+                                <option value="Cash">Cash</option>
+                                <option value="BG">BG</option>
+                                <option value="FDR">FDR</option>
+                                <option value="DD">DD</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pbg_required_percent">PBG Required (%):</label>
+                            <input type="number" id="pbg_required_percent" name="pbg_required_percent_str" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="pbg_required_inr">PBG Required (INR):</label>
+                            <input type="number" id="pbg_required_inr" name="pbg_required_inr_str" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="pbg_instrument_type">PBG Instrument Type:</label>
+                            <select id="pbg_instrument_type" name="pbg_instrument_type">
+                                <option value="">Select Type</option>
+                                <option value="Cash">Cash</option>
+                                <option value="BG">BG</option>
+                                <option value="FDR">FDR</option>
+                                <option value="DD">DD</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="competition_no_of_bidders">Competition (No. of Bidders):</label>
+                            <input type="number" id="competition_no_of_bidders" name="competition_no_of_bidders_str">
+                        </div>
+                        <div class="form-group">
+                            <label for="final_status_of_tender">Final Status of Tender:</label>
+                            <select id="final_status_of_tender" name="final_status_of_tender">
+                                <option value="">Select Status</option>
+                                <option value="To Be Submitted">To Be Submitted</option>
+                                <option value="Awarded">Awarded</option>
+                                <option value="Study">Study</option>
+                                <option value="Submitted">Submitted</option>
+                                <option value="Financial Opened">Financial Opened</option>
+                                <option value="Technical Opened">Technical Opened</option>
+                                <option value="Not Submitted">Not Submitted</option>
+                                <option value="Withdrawn">Withdrawn</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="remark">Remark:</label>
+                            <textarea id="remark" name="remark" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description:</label>
+                            <textarea id="description" name="description" rows="3"></textarea>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="form-column">
+                    <fieldset>
+                        <legend>Tender Details</legend>
+                        <div class="form-group">
+                            <label for="tender_status">Tender Status:<span class="required-asterisk">*</span></label>
+                            <select id="tender_status" name="tender_status" required>
+                                <option value="">Select Status</option>
+                                <option value="To Be Submitted">To Be Submitted</option>
+                                <option value="Awarded">Awarded</option>
+                                <option value="Study">Study</option>
+                                <option value="Submitted">Submitted</option>
+                                <option value="Financial Opened">Financial Opened</option>
+                                <option value="Technical Opened">Technical Opened</option>
+                                <option value="Not Submitted">Not Submitted</option>
+                                <option value="Withdrawn">Withdrawn</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tender_estimated_cost">Tender Estimated Cost (INR):<span class="required-asterisk">*</span></label>
+                            <input type="number" id="tender_estimated_cost" name="tender_estimated_cost_str" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tender_submission_date">Tender Submission Date:<span class="required-asterisk">*</span></label>
+                            <input type="date" id="tender_submission_date" name="tender_submission_date_str" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emd_required_inr">EMD Required (INR):<span class="required-asterisk">*</span></label>
+                            <input type="number" id="emd_required_inr" name="emd_required_inr_str" step="0.01" required>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Submit Project</button>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const projectForm = document.getElementById('projectForm');
+            const responseMessageDiv = document.getElementById('responseMessage');
+
+            if (responseMessageDiv.textContent.trim() === '') {
+                responseMessageDiv.style.display = 'none';
+            }
+
+            projectForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                responseMessageDiv.style.display = 'none';
+                responseMessageDiv.classList.remove('success', 'error');
+                responseMessageDiv.textContent = '';
+
+                const formData = new FormData(projectForm);
+
+                try {
+                    const response = await fetch('/projects/', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (response.ok) {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else {
+                            responseMessageDiv.classList.add('success');
+                            responseMessageDiv.textContent = 'Project submitted successfully!';
+                        }
+                    } else {
+                        const result = await response.json();
+                        responseMessageDiv.classList.add('error');
+                        let errorMessage = 'An unknown error occurred.';
+
+                        if (result && result.detail) {
+                            if (Array.isArray(result.detail)) {
+                                errorMessage = result.detail.map(item => {
+                                    if (typeof item === 'object' && item !== null) {
+                                        const loc = item.loc ? item.loc.join(' -> ') : 'unknown';
+                                        return `Field: ${loc}, Message: ${item.msg}`;
+                                    }
+                                    return String(item);
+                                }).join('<br>');
+                            } else {
+                                errorMessage = String(result.detail);
+                            }
+                        }
+                        responseMessageDiv.innerHTML = errorMessage;
+                    }
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                    responseMessageDiv.classList.add('error');
+                    responseMessageDiv.textContent = 'Network error or server unreachable. Please check your internet connection or try again later.';
+                }
+                responseMessageDiv.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Tendering Project Entry</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .btn-submit {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+        .links {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .links a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        .response-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            display: {% if error_message or success_message %}block{% else %}none{% endif %}; /* Show if messages exist */
+        }
+        .response-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .response-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Sign In</h2>
+        <form id="loginForm" method="POST" action="/signin"> {# CORRECTED ACTION HERE #}
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-submit">Sign In</button>
+        </form>
+        
+        <div id="responseMessage" class="response-message {% if error_message %}error{% elif success_message %}success{% endif %}">
+            {% if error_message %}{{ error_message }}{% elif success_message %}{{ success_message }}{% endif %}
+        </div>
+
+        <div class="links">
+            Don't have an account? <a href="/signup">Sign Up</a>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const loginForm = document.getElementById('loginForm');
+                const responseMessageDiv = document.getElementById('responseMessage');
+
+                // This JS is primarily for client-side display or if not using server-side Jinja rendering for messages.
+                // Since the backend now handles redirection, the client-side fetch might not be strictly necessary
+                // if the form is submitted via regular POST and the backend redirects.
+                // However, if you want to capture errors returned *without* a redirect, this is useful.
+
+                // If Jinja is already setting the message, this initial setup is for hiding/showing the div.
+                if (responseMessageDiv.textContent.trim() === '') {
+                    responseMessageDiv.style.display = 'none';
+                }
+                
+                loginForm.addEventListener('submit', async function(event) {
+                    // Prevent default form submission to handle it via fetch,
+                    // or remove this if you rely solely on server-side redirects for all responses.
+                    // For this example, we'll keep it to show error messages from backend.
+                    event.preventDefault(); 
+
+                    responseMessageDiv.style.display = 'none';
+                    responseMessageDiv.classList.remove('success', 'error');
+                    responseMessageDiv.textContent = ''; // Clear previous text content
+
+                    const formData = new FormData(loginForm);
+                    
+                    try {
+                        const response = await fetch('/signin', { // Ensure this matches the FastAPI route
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (response.redirected) {
+                            // If FastAPI sent a RedirectResponse (e.g., on successful login)
+                            window.location.href = response.url;
+                        } else {
+                            // If FastAPI sent a JSON response (e.g., error from validation)
+                            const errorData = await response.json();
+                            responseMessageDiv.classList.add('error');
+                            responseMessageDiv.textContent = errorData.detail || 'Login failed. Please check your credentials.';
+                            responseMessageDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        console.error('Network error during login:', error);
+                        responseMessageDiv.classList.add('error');
+                        responseMessageDiv.textContent = 'An unexpected error occurred. Please try again.';
+                        responseMessageDiv.style.display = 'block';
+                    }
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>
