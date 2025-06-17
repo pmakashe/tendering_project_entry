@@ -11,6 +11,14 @@
             flex-direction: column;
             min-height: 100vh;
             background-color: #f4f7f6; /* Light gray background */
+            padding-top: 56px; /* Space for fixed navbar */
+        }
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1030;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         .main-content {
             flex: 1; /* Take up remaining space */
@@ -25,47 +33,67 @@
             padding: 15px 0;
             text-align: center;
         }
+        .navbar {
+            background-color: #28a745;
+            padding: 8px 0;
+            box-shadow: none;
+        }
+        .navbar-brand {
+            color: white !important;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .navbar-nav .nav-link {
+            color: white !important;
+            margin-left: 20px;
+            font-size: 1rem;
+        }
+        .navbar-nav .nav-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/dashboard">Tendering Project Entry</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/dashboard">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/new_project">New Project Entry</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/projects_list">Projects List</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/reports">Reports</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/analytics">Analytics</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user_management">User Management</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/settings">Settings</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/signin">Logout</a>
-                    </li>
-                </ul>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/landing_page">Tendering Project Entry</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/project_dashboard">Project Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/new_project">New Project Entry</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/projects_list">Projects List</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                More
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/reports">Reports</a></li>
+                                <li><a class="dropdown-item" href="/analytics">Analytics</a></li>
+                                <li><a class="dropdown-item" href="/user_management">User Management</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/signin">Logout</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
     <div class="main-content">
         <div class="card shadow p-5 text-center" style="max-width: 500px; width: 90%;">
@@ -75,14 +103,14 @@
             <div class="d-grid gap-2 col-8 mx-auto">
                 <a href="/new_project" class="btn btn-primary btn-lg">Add Another Project</a>
                 <a href="/projects_list" class="btn btn-secondary btn-lg">View Projects List</a>
-                <a href="/dashboard" class="btn btn-outline-success btn-lg">Go to Dashboard</a>
+                <a href="/project_dashboard" class="btn btn-outline-success btn-lg">Go to Project Dashboard</a>
             </div>
         </div>
     </div>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; {{ now().year }} Tendering Project Entry. All rights reserved.</p>
+            <p>&copy; {{ current_year }} Tendering Project Entry. All rights reserved.</p>
         </div>
     </footer>
 

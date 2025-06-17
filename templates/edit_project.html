@@ -11,6 +11,14 @@
             flex-direction: column;
             min-height: 100vh;
             background-color: #f4f7f6; /* Light gray background */
+            padding-top: 56px; /* Space for fixed navbar */
+        }
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1030;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         .main-content {
             flex: 1; /* Allows main content to grow and push footer down */
@@ -19,18 +27,18 @@
         }
         .navbar {
             background-color: #28a745; /* Green color for the navbar */
-            padding: 15px 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 8px 0; /* Adjusted for compactness */
+            box-shadow: none;
         }
         .navbar-brand {
             color: white !important;
-            font-size: 1.5rem;
+            font-size: 1.3rem; /* Adjusted for compactness */
             font-weight: bold;
         }
         .navbar-nav .nav-link {
             color: white !important;
-            margin-left: 20px;
-            font-size: 1.1rem;
+            margin-left: 10px; /* Adjusted for compactness */
+            font-size: 1rem; /* Adjusted for compactness */
         }
         .navbar-nav .nav-link:hover {
             text-decoration: underline;
@@ -74,26 +82,42 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        /* Bootstrap validation styles */
+        .form-control.is-invalid, .form-select.is-invalid, .form-check-input.is-invalid {
+            border-color: #dc3545 !important;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right calc(.375em + .1875rem) center !important;
+            background-size: calc(.75em + .375rem) calc(.75em + .375rem) !important;
+        }
+        .invalid-feedback {
+            display: block; /* Override Bootstrap default hidden state */
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark w-100">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/dashboard">Tendering Project Entry</a>
+                <a class="navbar-brand" href="/landing_page">Tendering Project Entry</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="/dashboard">Dashboard</a>
+                            <a class="nav-link" href="/project_dashboard">Project Dashboard</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/new_project">New Project Entry</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/projects_list">Projects</a>
+                            <a class="nav-link" href="/projects_list">Projects List</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -110,7 +134,7 @@
                     </ul>
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="/logout">Logout</a>
+                            <a class="nav-link" href="/signin">Logout</a>
                         </li>
                     </ul>
                 </div>
@@ -122,19 +146,21 @@
         <div class="container">
             <div class="card">
                 <h2 class="text-center mb-4">Edit Project Entry: <span id="displayProjectId"></span></h2>
-                <div id="responseMessage" class="response-message"></div>
+                <div id="generalResponseMessage" class="response-message"></div>
 
-                <form id="editProjectForm" enctype="multipart/form-data">
+                <form id="editProjectForm" enctype="multipart/form-data" novalidate>
                     <input type="hidden" id="projectIdHidden" name="project_id_hidden">
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="project_id" class="form-label">Project ID</label>
                             <input type="text" class="form-control" id="project_id" name="project_id" readonly>
+                            <div class="invalid-feedback" id="project_id_feedback"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="tender_name" class="form-label">Tender Name</label>
                             <input type="text" class="form-control" id="tender_name" name="tender_name" required>
+                            <div class="invalid-feedback" id="tender_name_feedback"></div>
                         </div>
                     </div>
 
@@ -142,10 +168,12 @@
                         <div class="col-md-6 mb-3">
                             <label for="company_name" class="form-label">Company Name</label>
                             <input type="text" class="form-control" id="company_name" name="company_name" required>
+                            <div class="invalid-feedback" id="company_name_feedback"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="tender_entry_date" class="form-label">Tender Entry Date</label>
                             <input type="date" class="form-control" id="tender_entry_date" name="tender_entry_date" required>
+                            <div class="invalid-feedback" id="tender_entry_date_feedback"></div>
                         </div>
                     </div>
 
@@ -159,6 +187,7 @@
                                 <option value="Single Tender">Single Tender</option>
                                 <option value="e-Tender">e-Tender</option>
                             </select>
+                            <div class="invalid-feedback" id="tender_type_feedback"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="tender_status" class="form-label">Tender Status</label>
@@ -171,6 +200,7 @@
                                 <option value="Cancelled">Cancelled</option>
                                 <option value="On Hold">On Hold</option>
                             </select>
+                            <div class="invalid-feedback" id="tender_status_feedback"></div>
                         </div>
                     </div>
 
@@ -178,10 +208,12 @@
                         <div class="col-md-6 mb-3">
                             <label for="name_of_client" class="form-label">Name of Client</label>
                             <input type="text" class="form-control" id="name_of_client" name="name_of_client" required>
+                            <div class="invalid-feedback" id="name_of_client_feedback"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="tender_estimated_cost_inr" class="form-label">Tender Estimated Cost (INR)</label>
                             <input type="number" class="form-control" id="tender_estimated_cost_inr" name="tender_estimated_cost_inr" step="0.01" required>
+                            <div class="invalid-feedback" id="tender_estimated_cost_inr_feedback"></div>
                         </div>
                     </div>
 
@@ -189,10 +221,12 @@
                         <div class="col-md-6 mb-3">
                             <label for="emd_paid_inr" class="form-label">EMD Paid (INR)</label>
                             <input type="number" class="form-control" id="emd_paid_inr" name="emd_paid_inr" step="0.01" required>
+                            <div class="invalid-feedback" id="emd_paid_inr_feedback"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="performance_guarantee_submitted_inr" class="form-label">Performance Guarantee Submitted (INR)</label>
                             <input type="number" class="form-control" id="performance_guarantee_submitted_inr" name="performance_guarantee_submitted_inr" step="0.01">
+                            <div class="invalid-feedback" id="performance_guarantee_submitted_inr_feedback"></div>
                         </div>
                     </div>
 
@@ -200,10 +234,12 @@
                         <div class="col-md-6 mb-3">
                             <label for="tender_fees_paid_inr" class="form-label">Tender Fees Paid (INR)</label>
                             <input type="number" class="form-control" id="tender_fees_paid_inr" name="tender_fees_paid_inr" step="0.01">
+                            <div class="invalid-feedback" id="tender_fees_paid_inr_feedback"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="work_order_value_inr" class="form-label">Work Order Value (INR)</label>
                             <input type="number" class="form-control" id="work_order_value_inr" name="work_order_value_inr" step="0.01">
+                            <div class="invalid-feedback" id="work_order_value_inr_feedback"></div>
                         </div>
                     </div>
 
@@ -211,10 +247,12 @@
                         <div class="col-md-6 mb-3">
                             <label for="tender_submission_date" class="form-label">Tender Submission Date</label>
                             <input type="date" class="form-control" id="tender_submission_date" name="tender_submission_date">
+                            <div class="invalid-feedback" id="tender_submission_date_feedback"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="tender_opening_date" class="form-label">Tender Opening Date</label>
                             <input type="date" class="form-control" id="tender_opening_date" name="tender_opening_date">
+                            <div class="invalid-feedback" id="tender_opening_date_feedback"></div>
                         </div>
                     </div>
 
@@ -222,10 +260,12 @@
                         <div class="col-md-6 mb-3">
                             <label for="work_completion_date" class="form-label">Work Completion Date</label>
                             <input type="date" class="form-control" id="work_completion_date" name="work_completion_date">
+                            <div class="invalid-feedback" id="work_completion_date_feedback"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="contact_person" class="form-label">Contact Person</label>
                             <input type="text" class="form-control" id="contact_person" name="contact_person">
+                            <div class="invalid-feedback" id="contact_person_feedback"></div>
                         </div>
                     </div>
 
@@ -233,27 +273,32 @@
                         <div class="col-md-6 mb-3">
                             <label for="contact_number" class="form-label">Contact Number</label>
                             <input type="tel" class="form-control" id="contact_number" name="contact_number">
+                            <div class="invalid-feedback" id="contact_number_feedback"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="contact_email" class="form-label">Contact Email</label>
                             <input type="email" class="form-control" id="contact_email" name="contact_email">
+                            <div class="invalid-feedback" id="contact_email_feedback"></div>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="ref_tender_id" class="form-label">Reference Tender ID</label>
                         <input type="text" class="form-control" id="ref_tender_id" name="ref_tender_id">
+                        <div class="invalid-feedback" id="ref_tender_id_feedback"></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="attch_tender_document_path" class="form-label">Attach Tender Document (Current: <span id="currentDocument">None</span>)</label>
                         <input type="file" class="form-control" id="attch_tender_document_path" name="attch_tender_document_path">
                         <small class="form-text text-muted">Upload a new document to replace the current one.</small>
+                        <div class="invalid-feedback" id="attch_tender_document_path_feedback"></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="notes" class="form-label">Notes</label>
                         <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        <div class="invalid-feedback" id="notes_feedback"></div>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100">Update Project</button>
@@ -273,7 +318,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('editProjectForm');
-            const responseMessageDiv = document.getElementById('responseMessage');
+            const generalResponseMessageDiv = document.getElementById('generalResponseMessage');
             const displayProjectIdSpan = document.getElementById('displayProjectId');
             const projectIdHiddenInput = document.getElementById('projectIdHidden');
             const currentDocumentSpan = document.getElementById('currentDocument');
@@ -286,20 +331,20 @@
 
             const projectId = getProjectIdFromUrl();
             if (!projectId) {
-                responseMessageDiv.classList.add('error');
-                responseMessageDiv.textContent = 'Error: Project ID not found in URL.';
-                responseMessageDiv.style.display = 'block';
+                generalResponseMessageDiv.classList.add('error');
+                generalResponseMessageDiv.textContent = 'Error: Project ID not found in URL.';
+                generalResponseMessageDiv.style.display = 'block';
                 return;
             }
 
             displayProjectIdSpan.textContent = projectId;
-            projectIdHiddenInput.value = projectId; // Set the hidden input for form submission
+            projectIdHiddenInput.value = projectId;
 
             // Fetch existing project data
-            fetch(`/api/projects/${projectId}`) // You will need to add a GET /api/projects/{project_id} endpoint in main.txt
+            fetch(`/api/projects/${projectId}`)
                 .then(response => {
                     if (response.status === 401) {
-                        window.location.href = '/signin'; // Redirect to signin if not authenticated
+                        window.location.href = '/signin';
                         throw new Error('Unauthorized');
                     }
                     if (!response.ok) {
@@ -310,10 +355,11 @@
                 .then(projectData => {
                     // Populate the form fields with existing data
                     document.getElementById('project_id').value = projectData.project_id || '';
-                    document.getElementById('tender_name').value = projectData.tender_name || '';
+                    document.getElementById('tender_name').value = projectData.tender_name || ''; // Maps to project_name in DB
                     document.getElementById('company_name').value = projectData.company_name || '';
-                    document.getElementById('tender_entry_date').value = projectData.tender_entry_date || ''; // Dates are ISO format YYYY-MM-DD
-                    document.getElementById('tender_type').value = projectData.tender_type || '';
+                    // Convert datetime string to date for input type="date"
+                    document.getElementById('tender_entry_date').value = projectData.tender_entry_date ? projectData.tender_entry_date.split('T')[0] : '';
+                    document.getElementById('tender_type').value = projectData.tender_type || ''; // Maps to project_type in DB
                     document.getElementById('tender_status').value = projectData.tender_status || '';
                     document.getElementById('name_of_client').value = projectData.name_of_client || '';
                     document.getElementById('tender_estimated_cost_inr').value = projectData.tender_estimated_cost_inr || '';
@@ -327,13 +373,13 @@
                     document.getElementById('contact_person').value = projectData.contact_person || '';
                     document.getElementById('contact_number').value = projectData.contact_number || '';
                     document.getElementById('contact_email').value = projectData.contact_email || '';
-                    document.getElementById('ref_tender_id').value = projectData.ref_tender_id || '';
-                    document.getElementById('notes').value = projectData.notes || '';
+                    document.getElementById('ref_tender_id').value = projectData.ref_tender_id || ''; // Maps to tender_id in DB
+                    document.getElementById('notes').value = projectData.notes || ''; // Maps to description in DB
 
                     // Display current document path if available
                     if (projectData.attch_tender_document_path) {
                         const fileName = projectData.attch_tender_document_path.split('/').pop();
-                        currentDocumentSpan.innerHTML = `<a href="/static/${fileName}" target="_blank">${fileName}</a>`; // Assuming static files are served from /static
+                        currentDocumentSpan.innerHTML = `<a href="/static/${fileName}" target="_blank">${fileName}</a>`;
                     } else {
                         currentDocumentSpan.textContent = 'None';
                     }
@@ -341,66 +387,109 @@
                 })
                 .catch(error => {
                     console.error('Error fetching project data:', error);
-                    responseMessageDiv.classList.add('error');
-                    responseMessageDiv.textContent = `Failed to load project data: ${error.message}`;
-                    responseMessageDiv.style.display = 'block';
+                    generalResponseMessageDiv.classList.add('error');
+                    generalResponseMessageDiv.textContent = `Failed to load project data: ${error.message}`;
+                    generalResponseMessageDiv.style.display = 'block';
                 });
 
             // Handle form submission for update
             form.addEventListener('submit', async function(event) {
-                event.preventDefault(); // Prevent default form submission
-                responseMessageDiv.style.display = 'none'; // Hide previous messages
+                event.preventDefault();
+                
+                // Clear previous validation feedback
+                clearValidationFeedback();
+
+                generalResponseMessageDiv.style.display = 'none';
+                generalResponseMessageDiv.classList.remove('success', 'error');
 
                 const formData = new FormData(form);
-                // Remove the read-only project_id as it's passed in the URL path and hidden input
                 formData.delete('project_id'); 
                 
-                // The hidden input should be used for the URL parameter.
-                // It's also good practice to not rely on the hidden input, 
-                // but directly use the `projectId` variable obtained from the URL.
-
                 try {
                     const response = await fetch(`/api/projects/edit/${projectId}`, {
                         method: 'PUT',
-                        body: formData // FormData will correctly handle file uploads and other fields
+                        body: formData
                     });
 
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        responseMessageDiv.classList.remove('error');
-                        responseMessageDiv.classList.add('success');
-                        responseMessageDiv.textContent = result.message || 'Project updated successfully!';
-                        // Optionally redirect after a short delay
+                    if (response.ok) { // For PUT, a 200/204 is expected, not a redirect
+                        generalResponseMessageDiv.classList.remove('error');
+                        generalResponseMessageDiv.classList.add('success');
+                        const result = await response.json(); // Parse success message
+                        generalResponseMessageDiv.textContent = result.message || 'Project updated successfully!';
                         setTimeout(() => {
                              window.location.href = '/projects_list';
                         }, 1500); 
                     } else {
-                        responseMessageDiv.classList.remove('success');
-                        responseMessageDiv.classList.add('error');
+                        generalResponseMessageDiv.classList.remove('success');
+                        generalResponseMessageDiv.classList.add('error');
                         let errorMessage = 'Failed to update project.';
-                        if (result && result.detail) {
-                            if (Array.isArray(result.detail)) {
-                                errorMessage = result.detail.map(item => {
-                                    if (typeof item === 'object' && item !== null) {
-                                        return item.msg || item.message || item.detail || JSON.stringify(item);
-                                    }
-                                    return String(item);
-                                }).join('<br>');
-                            } else {
-                                errorMessage = String(result.detail);
-                            }
+                        const result = await response.json(); // Parse error response
+
+                        if (response.status === 422 && result && Array.isArray(result.detail)) {
+                            result.detail.forEach(error => {
+                                const fieldName = error.loc[error.loc.length - 1];
+                                
+                                // Map backend parameter names to frontend form field names
+                                let targetFieldName = fieldName;
+                                if (fieldName === 'project_name') targetFieldName = 'tender_name';
+                                else if (fieldName === 'tender_id') targetFieldName = 'ref_tender_id';
+                                else if (fieldName === 'description') targetFieldName = 'notes';
+                                else if (fieldName === 'project_type') targetFieldName = 'tender_type';
+                                else if (fieldName === 'tender_estimated_cost_inr_str') targetFieldName = 'tender_estimated_cost_inr';
+                                else if (fieldName === 'completion_period_month_str') targetFieldName = 'completion_period_month';
+                                else if (fieldName === 'tender_submission_date_str') targetFieldName = 'tender_submission_date';
+                                else if (fieldName === 'tender_opening_date_str') targetFieldName = 'tender_opening_date';
+                                else if (fieldName === 'pre_bid_meeting_date_str') targetFieldName = 'pre_bid_meeting_date';
+                                else if (fieldName === 'clarifications_issued_date_str') targetFieldName = 'clarifications_issued_date';
+                                else if (fieldName === 'corrigendum_received_date_str') targetFieldName = 'corrigendum_received_date';
+                                else if (fieldName === 'emd_required_inr_str') targetFieldName = 'emd_required_inr';
+                                else if (fieldName === 'emd_paid_inr_str') targetFieldName = 'emd_paid_inr';
+                                else if (fieldName === 'emd_bg_details_bg_expiry_date_str') targetFieldName = 'emd_bg_details_bg_expiry_date';
+                                else if (fieldName === 'emd_return_date_str') targetFieldName = 'emd_return_date';
+                                else if (fieldName === 'sd_required_percent_str') targetFieldName = 'sd_required_percent';
+                                else if (fieldName === 'sd_required_inr_str') targetFieldName = 'sd_required_inr';
+                                else if (fieldName === 'pbg_required_percent_str') targetFieldName = 'pbg_required_percent';
+                                else if (fieldName === 'pbg_required_inr_str') targetFieldName = 'pbg_required_inr';
+                                else if (fieldName === 'competition_no_of_bidders_str') targetFieldName = 'competition_no_of_bidders';
+                                else if (fieldName === 'tender_fees_paid_inr_str') targetFieldName = 'tender_fees_paid_inr';
+                                else if (fieldName === 'work_order_value_inr_str') targetFieldName = 'work_order_value_inr';
+                                else if (fieldName === 'work_completion_date_str') targetFieldName = 'work_completion_date';
+
+
+                                const targetFieldElement = document.querySelector(`[name="${targetFieldName}"]`);
+                                const targetFeedbackElement = document.getElementById(`${targetFieldName}_feedback`);
+
+
+                                if (targetFieldElement) {
+                                    targetFieldElement.classList.add('is-invalid');
+                                }
+                                if (targetFeedbackElement) {
+                                    targetFeedbackElement.textContent = error.msg;
+                                }
+                            });
+                            errorMessage = 'Please correct the errors in the form.';
+                        } else if (result && result.detail) {
+                            errorMessage = String(result.detail);
                         }
-                        responseMessageDiv.innerHTML = errorMessage;
+                        generalResponseMessageDiv.innerHTML = errorMessage;
                     }
                 } catch (error) {
                     console.error('Error submitting form:', error);
-                    responseMessageDiv.classList.remove('success');
-                    responseMessageDiv.classList.add('error');
-                    responseMessageDiv.textContent = 'Network error or server unreachable. Please try again.';
+                    generalResponseMessageDiv.classList.remove('success');
+                    generalResponseMessageDiv.classList.add('error');
+                    generalResponseMessageDiv.textContent = 'Network error or server unreachable. Please try again.';
                 }
-                responseMessageDiv.style.display = 'block';
+                generalResponseMessageDiv.style.display = 'block';
             });
+
+            function clearValidationFeedback() {
+                document.querySelectorAll('.is-invalid').forEach(element => {
+                    element.classList.remove('is-invalid');
+                });
+                document.querySelectorAll('.invalid-feedback').forEach(feedback => {
+                    feedback.textContent = '';
+                });
+            }
         });
     </script>
 </body>

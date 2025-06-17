@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page - Tendering Project Entry</title>
+    <link href="/static/css/tailwind.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans flex h-screen">
+    <header class="bg-white shadow p-4 flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold">Your Company Name</h1>
+            <p class="text-sm text-gray-600">123 Company Street</p>
+        </div>
+        <img src="/static/company_logo.png" alt="Your Company Name" class="h-10">
+    </header>
+
+    <div class="flex flex-1">
+        <!-- Sidebar -->
+        <nav class="w-64 bg-gray-800 text-white p-4 space-y-6">
+            <h2 class="text-xl font-bold">Welcome, User!</h2>
+            <ul class="space-y-2">
+                <li><a href="/project_dashboard" class="block py-2 px-4 hover:bg-gray-700 rounded">Project Dashboard</a></li>
+                <li><a href="/tender_search" class="block py-2 px-4 hover:bg-gray-700 rounded">Tender Search</a></li>
+                <li><a href="/daily_work_status_dashboard" class="block py-2 px-4 hover:bg-gray-700 rounded">Daily Work Status</a></li>
+                <li><a href="/home" class="block py-2 px-4 hover:bg-gray-700 rounded">Task</a></li>
+                <li><a href="#" class="block py-2 px-4 hover:bg-gray-700 rounded">Tab 5 (Coming Soon)</a></li>
+                <li>
+                    <div class="relative">
+                        <button class="block py-2 px-4 hover:bg-gray-700 rounded w-full text-left" onclick="toggleDropdown()">More</button>
+                        <div id="dropdown" class="hidden absolute bg-gray-700 w-full rounded mt-1">
+                            <a href="/reports" class="block py-2 px-4 hover:bg-gray-600">Reports</a>
+                            <a href="/analytics" class="block py-2 px-4 hover:bg-gray-600">Analytics</a>
+                            <a href="/user_management" class="block py-2 px-4 hover:bg-gray-600">User Management</a>
+                            <a href="/settings" class="block py-2 px-4 hover:bg-gray-600">Settings</a>
+                        </div>
+                    </li>
+                </ul>
+                <div class="p-4">
+                    <a href="/company_documents" class="block py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600">Company Documents</a>
+                </div>
+                <a href="/signin" class="block py-2 px-4 hover:bg-gray-700 rounded mt-auto">Logout</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+        <h2 class="text-2xl font-bold mb-4">Welcome to the Tendering Project Management System!</h2>
+        <p class="mb-4">Your central hub for managing all tendering activities.</p>
+        <p>Use the navigation links in the left sidebar to explore the application.</p>
+    </main>
+</div>
+
+<footer class="bg-gray-800 text-white text-center p-4 mt-auto">
+    <p>© {{ current_year }} Tendering Project Entry. All rights reserved.</p>
+</footer>
+
+<script>
+    function toggleDropdown() {
+        const dropdown = document.getElementById('dropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('hidden');
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Work Status Dashboard - Tendering Project Entry</title>
+    <link href="/static/css/tailwind.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container { max-width: 600px; height: 300px; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-800 text-white p-6 flex flex-col justify-between">
+            <div>
+                <h1 class="text-2xl font-bold mb-6">Tendering Project Entry</h1>
+                <nav>
+                    <ul class="space-y-2">
+                        <li><a href="/project_dashboard" class="block py-2 px-4 hover:bg-gray-700 rounded">Project Dashboard</a></li>
+                        <li><a href="/new_project" class="block py-2 px-4 hover:bg-gray-700 rounded">New Project Entry</a></li>
+                        <li><a href="/projects_list" class="block py-2 px-4 hover:bg-gray-700 rounded">Projects List</a></li>
+                        <li><a href="/daily_work_status_dashboard" class="block py-2 px-4 bg-gray-700 rounded">Daily Work Status</a></li>
+                        <li>
+                            <div class="relative">
+                                <button class="block py-2 px-4 hover:bg-gray-700 rounded w-full text-left" onclick="toggleDropdown()">More</button>
+                                <div id="dropdown" class="hidden absolute bg-gray-700 w-full rounded mt-1">
+                                    <a href="/reports" class="block py-2 px-4 hover:bg-gray-600">Reports</a>
+                                    <a href="/analytics" class="block py-2 px-4 hover:bg-gray-600">Analytics</a>
+                                    <a href="/user_management" class="block py-2 px-4 hover:bg-gray-600">User Management</a>
+                                    <a href="/settings" class="block py-2 px-4 hover:bg-gray-600">Settings</a>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <a href="/signin" class="block py-2 px-4 hover:bg-gray-700 rounded">Logout</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Daily Work Status Dashboard</h2>
+                <a href="/daily_work_entry_form" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">New Daily Entry</a>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700">Total Completed Tasks</h3>
+                    <p id="total_completed" class="text-2xl font-bold text-blue-600">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700">Tasks Not Started</h3>
+                    <p id="total_not_started" class="text-2xl font-bold text-red-600">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700">Overdue Tasks</h3>
+                    <p id="total_overdue" class="text-2xl font-bold text-orange-600">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700">Tasks Due Today</h3>
+                    <p id="total_due_today" class="text-2xl font-bold text-green-600">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700">Average Delay (Days)</h3>
+                    <p id="average_delay" class="text-2xl font-bold text-purple-600">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700">Average Open Duration (Days)</h3>
+                    <p id="average_open_duration" class="text-2xl font-bold text-teal-600">0</p>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Work Status - Overall</h3>
+                    <div class="chart-container">
+                        <canvas id="work_status_overall"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Overdue Tasks - Personwise</h3>
+                    <div class="chart-container">
+                        <canvas id="overdue_person"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Overdue Tasks - Projectwise</h3>
+                    <div class="chart-container">
+                        <canvas id="overdue_project"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Current Work Status - Personwise</h3>
+                    <div class="chart-container">
+                        <canvas id="status_person"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">% of Tasks Completed On Time</h3>
+                    <div class="chart-container">
+                        <canvas id="on_time_percentage"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-4">
+        <p>© 2025 Tendering Project Entry. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch('/api/daily_work_summary');
+                const data = await response.json();
+
+                // Update Metrics
+                document.getElementById('total_completed').textContent = data.total_completed || 0;
+                document.getElementById('total_not_started').textContent = data.total_not_started || 0;
+                document.getElementById('total_overdue').textContent = data.total_overdue || 0;
+                document.getElementById('total_due_today').textContent = data.total_due_today || 0;
+                document.getElementById('average_delay').textContent = (data.average_delay_days || 0).toFixed(2);
+                document.getElementById('average_open_duration').textContent = (data.average_open_duration_days || 0).toFixed(2);
+
+                // Work Status - Overall
+                const workStatusData = {
+                    labels: ['Completed', 'In Progress', 'Not Started'],
+                    datasets: [{
+                        label: 'Tasks',
+                        data: [
+                            data.total_completed || 0,
+                            (data.total_tasks || 0) - (data.total_completed || 0) - (data.total_not_started || 0),
+                            data.total_not_started || 0
+                        ],
+                        backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384']
+                    }]
+                };
+                new Chart(document.getElementById('work_status_overall'), {
+                    type: 'pie',
+                    data: workStatusData,
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                // Overdue Tasks - Personwise
+                const overduePersonData = {
+                    labels: Object.keys(data.overdue_by_person || {}),
+                    datasets: [{
+                        label: 'Overdue Tasks',
+                        data: Object.values(data.overdue_by_person || {}),
+                        backgroundColor: '#FF6384'
+                    }]
+                };
+                if (overduePersonData.labels.length > 0) {
+                    new Chart(document.getElementById('overdue_person'), {
+                        type: 'bar',
+                        data: overduePersonData,
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                } else {
+                    document.getElementById('overdue_person').parentElement.innerHTML = '<p class="text-gray-500">No data for this chart.</p>';
+                }
+
+                // Overdue Tasks - Projectwise
+                const overdueProjectData = {
+                    labels: Object.keys(data.overdue_by_project || {}),
+                    datasets: [{
+                        label: 'Overdue Tasks',
+                        data: Object.values(data.overdue_by_project || {}),
+                        backgroundColor: '#36A2EB'
+                    }]
+                };
+                if (overdueProjectData.labels.length > 0) {
+                    new Chart(document.getElementById('overdue_project'), {
+                        type: 'bar',
+                        data: overdueProjectData,
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                } else {
+                    document.getElementById('overdue_project').parentElement.innerHTML = '<p class="text-gray-500">No data for this chart.</p>';
+                }
+
+                // Current Work Status - Personwise
+                const statusPersonData = {
+                    labels: Object.keys(data.status_by_person || {}),
+                    datasets: [
+                        {
+                            label: 'Completed',
+                            data: Object.values(data.status_by_person || {}).map(v => v.Completed || 0),
+                            backgroundColor: '#36A2EB'
+                        },
+                        {
+                            label: 'In Progress',
+                            data: Object.values(data.status_by_person || {}).map(v => v['In Progress'] || 0),
+                            backgroundColor: '#FFCE56'
+                        },
+                        {
+                            label: 'Not Started',
+                            data: Object.values(data.status_by_person || {}).map(v => v['Not Started'] || 0),
+                            backgroundColor: '#FF6384'
+                        }
+                    ]
+                };
+                if (statusPersonData.labels.length > 0) {
+                    new Chart(document.getElementById('status_person'), {
+                        type: 'bar',
+                        data: statusPersonData,
+                        options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+                    });
+                } else {
+                    document.getElementById('status_person').parentElement.innerHTML = '<p class="text-gray-500">No data for this chart.</p>';
+                }
+
+                // % of Tasks Completed On Time
+                const onTimeData = {
+                    labels: ['On Time', 'Late'],
+                    datasets: [{
+                        label: '% of Tasks',
+                        data: [data.on_time_percentage || 0, 100 - (data.on_time_percentage || 0)],
+                        backgroundColor: ['#36A2EB', '#FF6384']
+                    }]
+                };
+                new Chart(document.getElementById('on_time_percentage'), {
+                    type: 'pie',
+                    data: onTimeData,
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+            }
+        }
+
+        window.onload = fetchDashboardData;
+    </script>
+</body>
+</html>

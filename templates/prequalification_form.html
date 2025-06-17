@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prequalification Form - Tendering Project Entry</title>
+    <link href="/static/css/tailwind.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-gray-800 text-white p-4 flex flex-col">
+        <div class="flex items-center mb-6">
+            <a href="/landing_page" class="text-white focus:outline-none mr-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
+            <h1 class="text-xl font-bold">Tendering Project Entry</h1>
+        </div>
+        <nav class="flex-1">
+            <ul class="space-y-2">
+                <li><a href="/home" class="block py-2 px-4 hover:bg-gray-700 rounded">Home</a></li>
+                <li><a href="/all_tasks" class="block py-2 px-4 hover:bg-gray-700 rounded">All Tasks</a></li>
+                <li><a href="/my_tasks" class="block py-2 px-4 hover:bg-gray-700 rounded">My Tasks</a></li>
+                <li><a href="/reports" class="block py-2 px-4 hover:bg-gray-700 rounded">Reports</a></li>
+                <li><a href="/projects" class="block py-2 px-4 hover:bg-gray-700 rounded">Projects</a></li>
+            </ul>
+        </nav>
+        <a href="/signin" class="block py-2 px-4 hover:bg-gray-700 rounded text-center mt-auto">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-6 overflow-y-auto">
+        <h2 class="text-2xl font-bold mb-4">Prequalification Form</h2>
+        <form id="prequalificationForm" class="bg-white p-6 rounded-lg shadow">
+            <input type="hidden" id="projectId" name="project_id">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Name of Project:</label>
+                <input type="text" id="projectName" class="w-full p-2 border border-gray-300 rounded bg-yellow-100" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Tender ID:</label>
+                <input type="text" id="tenderId" class="w-full p-2 border border-gray-300 rounded bg-yellow-100" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Name of Client:</label>
+                <input type="text" id="clientName" class="w-full p-2 border border-gray-300 rounded bg-yellow-100" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Estimated Cost (₹):</label>
+                <input type="text" id="estimatedCost" class="w-full p-2 border border-gray-300 rounded bg-yellow-100" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">EMD Cost (₹):</label>
+                <input type="text" id="emdCost" class="w-full p-2 border border-gray-300 rounded bg-yellow-100" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Time Period for Completion (Months):</label>
+                <input type="text" id="completionPeriod" class="w-full p-2 border border-gray-300 rounded bg-yellow-100" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Bid Submission End Date:</label>
+                <input type="text" id="bidEndDate" class="w-full p-2 border border-gray-300 rounded bg-yellow-100" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Pre-bid Meeting Date:</label>
+                <input type="text" id="preBidDate" class="w-full p-2 border border-gray-300 rounded bg-yellow-100" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Registrations (IREPS):</label>
+                <input type="text" id="registrations" class="w-full p-2 border border-gray-300 rounded bg-green-100" placeholder="Enter registration details">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Financial Turnover (3 Years Avg, ₹):</label>
+                <input type="text" id="turnover" class="w-full p-2 border border-gray-300 rounded bg-green-100" placeholder="Enter turnover">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Similar Work Details:</label>
+                <textarea id="similarWork" class="w-full p-2 border border-gray-300 rounded bg-green-100" placeholder="Enter similar work details" rows="3"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Additional Qualification (Building Rating):</label>
+                <input type="text" id="buildingRating" class="w-full p-2 border border-gray-300 rounded bg-green-100" placeholder="Enter rating details">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Solvency (₹):</label>
+                <input type="text" id="solvency" class="w-full p-2 border border-gray-300 rounded bg-red-100" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Networth (₹):</label>
+                <input type="text" id="networth" class="w-full p-2 border border-gray-300 rounded bg-red-100" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Bid Capacity (₹):</label>
+                <input type="text" id="bidCapacity" class="w-full p-2 border border-gray-300 rounded bg-red-100" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold">Sr. No.:</label>
+                <input type="text" id="srNo" class="w-full p-2 border border-gray-300 rounded bg-blue-100" readonly>
+            </div>
+            <div class="flex justify-end space-x-4 mt-6">
+                <button type="button" onclick="clearForm()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Clear</button>
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Submit</button>
+                <a href="/projects" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 text-center">Back to Project List</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Load project data and pre-filled form data
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('project_id');
+            document.getElementById('projectId').value = projectId || '';
+
+            // Fetch project data (simulated for now, replace with API call)
+            fetch(`/api/projects/${projectId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('projectName').value = data.project_name || '';
+                    document.getElementById('tenderId').value = data.tender_id || '';
+                    document.getElementById('clientName').value = data.name_of_client || '';
+                    document.getElementById('estimatedCost').value = data.tender_estimated_cost_inr ? `₹${data.tender_estimated_cost_inr}` : '';
+                    document.getElementById('emdCost').value = data.emd_required_inr ? `₹${data.emd_required_inr} Lakh` : '';
+                    document.getElementById('completionPeriod').value = data.completion_period_month || '';
+                    document.getElementById('bidEndDate').value = data.tender_submission_date ? new Date(data.tender_submission_date).toLocaleDateString() : '';
+                    document.getElementById('preBidDate').value = data.pre_bid_meeting_date ? new Date(data.pre_bid_meeting_date).toLocaleDateString() : '';
+
+                    // Fetch prequalification data (simulated for now)
+                    fetch(`/api/prequalification?project_id=${projectId}`)
+                        .then(response => response.json())
+                        .then(prequalData => {
+                            if (prequalData) {
+                                document.getElementById('registrations').value = prequalData.registrations || '';
+                                document.getElementById('turnover').value = prequalData.turnover || '';
+                                document.getElementById('similarWork').value = prequalData.similarWork || '';
+                                document.getElementById('buildingRating').value = prequalData.buildingRating || '';
+                                document.getElementById('solvency').value = prequalData.solvency || '';
+                                document.getElementById('networth').value = prequalData.networth || '';
+                                document.getElementById('bidCapacity').value = prequalData.bidCapacity || '';
+                                document.getElementById('srNo').value = prequalData.srNo || '1';
+                            } else {
+                                document.getElementById('srNo').value = '1'; // Default Sr. No.
+                            }
+                        })
+                        .catch(error => console.error('Error fetching prequalification data:', error));
+                })
+                .catch(error => console.error('Error fetching project data:', error));
+        });
+
+        function clearForm() {
+            document.getElementById('registrations').value = '';
+            document.getElementById('turnover').value = '';
+            document.getElementById('similarWork').value = '';
+            document.getElementById('buildingRating').value = '';
+        }
+
+        document.getElementById('prequalificationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const projectId = document.getElementById('projectId').value;
+            const formData = {
+                project_id: projectId,
+                registrations: document.getElementById('registrations').value,
+                turnover: document.getElementById('turnover').value,
+                similarWork: document.getElementById('similarWork').value,
+                buildingRating: document.getElementById('buildingRating').value,
+                solvency: document.getElementById('solvency').value,
+                networth: document.getElementById('networth').value,
+                bidCapacity: document.getElementById('bidCapacity').value,
+                srNo: document.getElementById('srNo').value
+            };
+
+            try {
+                const response = await fetch('/api/prequalification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                if (response.ok) {
+                    alert('Prequalification submitted successfully!');
+                } else {
+                    throw new Error('Failed to submit prequalification');
+                }
+            } catch (error) {
+                console.error('Error submitting prequalification:', error);
+                alert('Error submitting prequalification. Check console for details.');
+            }
+        });
+    </script>
+</body>
+</html>

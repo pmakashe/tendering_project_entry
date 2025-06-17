@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Tendering Project Entry</title>
+    <link href="/static/css/tailwind.css" rel="stylesheet">
+    <style>
+        .sidebar-collapsed {
+            width: 4rem;
+        }
+        .sidebar-collapsed .nav-item {
+            display: none;
+        }
+        .sidebar-collapsed .sidebar-header h1 {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans flex h-screen">
+    <!-- Sidebar -->
+    <div id="sidebar" class="w-64 bg-gray-800 text-white p-4 flex flex-col transition-all duration-300 ease-in-out">
+        <div class="sidebar-header flex items-center mb-6">
+            <button id="toggle-btn" class="text-white focus:outline-none mr-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+            <a href="/landing_page" class="text-white focus:outline-none mr-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
+            <h1 class="text-xl font-bold">Tendering Project Entry</h1>
+        </div>
+        <nav class="flex-1 nav-content">
+            <ul class="space-y-2">
+                <li><a href="/home" class="block py-2 px-4 hover:bg-gray-700 rounded">Home</a></li>
+                <li><a href="/all_tasks" class="block py-2 px-4 hover:bg-gray-700 rounded">All Tasks</a></li>
+                <li><a href="/my_tasks" class="block py-2 px-4 hover:bg-gray-700 rounded">My Tasks</a></li>
+                <li><a href="/reports" class="block py-2 px-4 hover:bg-gray-700 rounded">Reports</a></li>
+                <li><a href="/projects" class="block py-2 px-4 hover:bg-gray-700 rounded">Projects</a></li>
+            </ul>
+        </nav>
+        <a href="/signin" class="block py-2 px-4 hover:bg-gray-700 rounded text-center mt-auto">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-6 overflow-y-auto">
+        <!-- Search Bar -->
+        <div class="mb-6">
+            <input type="text" placeholder="Search activity, tasks, projects..." class="w-full p-2 rounded-lg border border-gray-300">
+        </div>
+
+        <!-- Greeting and Task Status -->
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold mb-2">Good evening, Prashant</h2>
+            <div class="bg-white p-4 rounded-lg shadow flex justify-between items-center">
+                <span>My month</span>
+                <span>0 tasks completed</span>
+                <span>0 due for today</span>
+                <button class="text-blue-500">Customize</button>
+            </div>
+        </div>
+
+        <!-- My Tasks Box -->
+        <div class="bg-white p-4 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">My Tasks</h3>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span>Draft tender</span>
+                    <span class="text-gray-500">Today - Jun 18</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>Attend meeting</span>
+                    <span class="text-gray-500">Jun 17 - 19</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects Box -->
+        <div class="bg-white p-4 rounded-lg shadow mt-4">
+            <h3 class="text-lg font-semibold mb-2">Projects</h3>
+            <div class="space-y-2">
+                <button class="w-full text-left p-2 bg-gray-100 rounded">PUNE (3 tasks due soon)</button>
+                <button class="w-full text-left p-2 bg-gray-100 rounded">Create project</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('toggle-btn').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('sidebar-collapsed');
+        });
+    </script>
+</body>
+</html>

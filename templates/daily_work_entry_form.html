@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Daily Work Entry - Tendering Project Entry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding-top: 56px; /* Space for fixed navbar */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-y: hidden; /* Hide body scrollbar to enforce single screen */
+        }
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1030;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .main-content {
+            flex: 1;
+            padding-top: 10px; /* Reduced padding-top */
+            padding-bottom: 10px; /* Reduced padding-bottom */
+            overflow-y: auto; /* Allow content area to scroll if form is very long */
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Center content vertically if space allows */
+        }
+        .navbar {
+            background-color: #28a745;
+            padding: 8px 0;
+            box-shadow: none;
+        }
+        .navbar-brand {
+            color: white !important;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .navbar-nav .nav-link {
+            color: white !important;
+            margin-left: 10px;
+            font-size: 1rem;
+        }
+        .navbar-nav .nav-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            padding: 10px 0; /* Reduced padding */
+            text-align: center;
+            margin-top: auto;
+            font-size: 0.85rem;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px; /* Reduced padding */
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 950px; /* Adjusted max-width to allow more fields per row */
+            box-sizing: border-box;
+            margin-top: 0;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px; /* Reduced margin */
+            font-size: 1.8rem; /* Smaller title */
+        }
+        .form-group {
+            margin-bottom: 10px; /* Reduced margin between form groups */
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 3px; /* Reduced margin below label */
+            color: #555;
+            font-weight: bold;
+            font-size: 0.85rem; /* Smaller label font */
+        }
+        .form-control, .form-select, .form-control[type="date"], .form-control[type="number"] {
+            padding: 0.5rem 0.75rem; /* Smaller padding for inputs */
+            font-size: 0.9rem; /* Smaller input font */
+        }
+        .row.form-fields {
+            margin-left: -5px; /* Compensate for column padding */
+            margin-right: -5px;
+        }
+        .row.form-fields > div {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        .btn-submit {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px; /* Reduced padding */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem; /* Adjusted font size */
+            width: 100%;
+            margin-top: 15px; /* Reduced margin */
+        }
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+        .response-message-daily-entry {
+            margin-top: 15px; /* Reduced margin */
+            padding: 10px; /* Reduced padding */
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem; /* Smaller message font */
+            display: none;
+        }
+        .response-message-daily-entry.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .response-message-daily-entry.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .required-asterisk {
+            color: red;
+            margin-left: 3px; /* Reduced margin */
+        }
+        /* Bootstrap validation styles */
+        .form-control.is-invalid, .form-select.is-invalid {
+            border-color: #dc3545 !important;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right calc(.375em + .1875rem) center !important;
+            background-size: calc(.75em + .375rem) calc(.75em + .375rem) !important;
+        }
+        .invalid-feedback {
+            display: block;
+            width: 100%;
+            margin-top: 0.15rem; /* Reduced margin-top */
+            font-size: 0.8rem; /* Smaller font size */
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/landing_page">Tendering Project Entry</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/project_dashboard">Project Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/new_project">New Project Entry</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/projects_list">Projects List</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                More
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/reports">Reports</a></li>
+                                <li><a class="dropdown-item" href="/analytics">Analytics</a></li>
+                                <li><a class="dropdown-item" href="/user_management">User Management</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/signin">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <h2>New Daily Work Entry</h2>
+            <div id="responseMessage" class="response-message-daily-entry"></div>
+
+            <form id="dailyWorkEntryForm" novalidate>
+                <div class="row form-fields">
+                    {# Row 1: Sr. No., Name of Project, Activity Name #}
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="sr_no" class="form-label">Sr. No.:<span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" id="sr_no" name="sr_no" required readonly> {# Readonly for auto-gen #}
+                            <div class="invalid-feedback" id="sr_no_feedback"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="name_of_project" class="form-label">Name of Project:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="name_of_project" name="name_of_project" required>
+                                <option value="">Select Project</option>
+                                <option value="Autofina">Autofina</option>
+                                <option value="Baramati">Baramati</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="ERP work">ERP work</option>
+                                <option value="Jalgaon">Jalgaon</option>
+                                <option value="Karad">Karad</option>
+                                <option value="Metro">Metro</option>
+                                <option value="Tendering">Tendering</option>
+                                <option value="Udgir">Udgir</option>
+                                <option value="PDA">PDA</option>
+                                <option value="PCMC">PCMC</option>
+                                <option value="HR">HR</option>
+                                <option value="Jhansi Convesion">Jhansi Convesion</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div class="invalid-feedback" id="name_of_project_feedback"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="activity_name" class="form-label">Activity Name:<span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" id="activity_name" name="activity_name" required>
+                            <div class="invalid-feedback" id="activity_name_feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row form-fields">
+                    {# Row 2: Activity Description, Priority, Allocated to #}
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="activity_description" class="form-label">Activity Description:</label>
+                            <textarea class="form-control" id="activity_description" name="activity_description" rows="2"></textarea> {# Reduced rows #}
+                            <div class="invalid-feedback" id="activity_description_feedback"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="priority" class="form-label">Priority:</label>
+                            <select class="form-select" id="priority" name="priority">
+                                <option value="">Select Priority</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                            <div class="invalid-feedback" id="priority_feedback"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="allocated_to" class="form-label">Allocated to:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="allocated_to" name="allocated_to" required>
+                                <option value="">Select Person</option>
+                                <option value="Prashant">Prashant</option>
+                                <option value="Kiran">Kiran</option>
+                                <option value="Priyanka">Priyanka</option>
+                                </select>
+                            <div class="invalid-feedback" id="allocated_to_feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row form-fields">
+                    {# Row 3: Allocation Date, Due Date #}
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="allocation_date" class="form-label">Allocation Date:<span class="required-asterisk">*</span></label>
+                            <input type="date" class="form-control" id="allocation_date" name="allocation_date" required>
+                            <div class="invalid-feedback" id="allocation_date_feedback"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="due_date" class="form-label">Due Date:<span class="required-asterisk">*</span></label>
+                            <input type="date" class="form-control" id="due_date" name="due_date" required>
+                            <div class="invalid-feedback" id="due_date_feedback"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        {# Expected Time Removed #}
+                        <div class="form-group mb-3">
+                            <label for="completed_on" class="form-label">Completed On:</label>
+                            <input type="date" class="form-control" id="completed_on" name="completed_on">
+                            <div class="invalid-feedback" id="completed_on_feedback"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row form-fields">
+                    {# Row 4: Work Done Details, Status Summery #}
+                    <div class="col-md-6"> {# Made Work Done Details wider #}
+                        <div class="form-group mb-3">
+                            <label for="work_done_details" class="form-label">Work Done Details:</label>
+                            <textarea class="form-control" id="work_done_details" name="work_done_details" rows="3" placeholder="Enter date-wise work details here."></textarea> {# Increased rows slightly, added placeholder #}
+                            <div class="invalid-feedback" id="work_done_details_feedback"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="status_summary" class="form-label">Status Summary:<span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="status_summary" name="status_summary" required>
+                                <option value="">Select Status</option>
+                                <option value="Completed">Completed</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Not Started">Not Started</option>
+                            </select>
+                            <div class="invalid-feedback" id="status_summary_feedback"></div>
+                        </div>
+                         <div class="form-group mb-3">
+                            <label for="remark" class="form-label">Remark:</label>
+                            <textarea class="form-control" id="remark" name="remark" rows="2"></textarea> {# Reduced rows #}
+                            <div class="invalid-feedback" id="remark_feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary">Submit Daily Entry</button>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('dailyWorkEntryForm').reset(); clearValidationFeedback();">Clear</button>
+                    <a href="/daily_work_status_dashboard" class="btn btn-outline-secondary">Back to Dashboard</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Tendering Project Entry. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('dailyWorkEntryForm');
+            const responseMessageDiv = document.getElementById('responseMessage');
+
+            // Auto-generate Sr. No. (MM/YYYY-0001 format)
+            function generateSrNo() {
+                const now = new Date();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0'); // MM format
+                const year = now.getFullYear().toString().slice(-4); // YYYY format
+                // In a real app, you'd fetch the last sequence from the DB for the current month/year
+                // For now, it's a fixed starting point for demo.
+                document.getElementById('sr_no').value = `${month}/${year}-0001`; 
+            }
+            generateSrNo();
+
+            function showMessage(message, type) {
+                responseMessageDiv.textContent = message;
+                responseMessageDiv.className = `response-message-daily-entry ${type}`;
+                responseMessageDiv.style.display = 'block';
+                setTimeout(() => responseMessageDiv.style.display = 'none', 5000);
+            }
+
+            window.clearValidationFeedback = () => { // Made global for onclick
+                document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+            };
+
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                clearValidationFeedback();
+                responseMessageDiv.style.display = 'none';
+
+                const formData = new FormData(form);
+                
+                // Fields to be automatically calculated by backend, so remove them from formData if present
+                formData.delete('is_activity_overdue');
+                formData.delete('delay_in_days');
+                formData.delete('due_today');
+                formData.delete('on_time');
+                formData.delete('open_duration_days');
+                // Removed 'Helped By' from HTML, so no need to delete here
+                // Removed 'Expected Time' and 'Total Time' from HTML, so no need to delete here
+
+                try {
+                    showMessage('Submitting entry...', 'info');
+                    const response = await fetch('/api/daily_work_entries', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        showMessage(result.message || 'Daily entry saved successfully!', 'success');
+                        form.reset(); // Clear form on success
+                        generateSrNo(); // Re-generate Sr. No. for next entry
+                        // Optional: Redirect to dashboard or list of entries
+                        // window.location.href = '/daily_work_status_dashboard';
+                    } else if (response.status === 422 && result && Array.isArray(result.detail)) {
+                        result.detail.forEach(error => {
+                            const fieldName = error.loc[error.loc.length - 1]; // Get the last part of the 'loc' array
+                            const fieldElement = document.getElementById(fieldName);
+                            const feedbackElement = document.getElementById(`${fieldName}_feedback`);
+
+                            if (fieldElement) {
+                                fieldElement.classList.add('is-invalid');
+                            }
+                            if (feedbackElement) {
+                                feedbackElement.textContent = error.msg;
+                            }
+                        });
+                        showMessage('Please correct the errors in the form.', 'error');
+                    } else {
+                        showMessage(result.detail || 'Failed to save daily entry.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Network error during daily entry submission:', error);
+                    showMessage('Network error: Could not save daily entry. Please try again.', 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

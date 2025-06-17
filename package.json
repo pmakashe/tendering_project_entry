@@ -1,0 +1,22 @@
+{
+  "name": "tendering_project_entry",
+  "version": "1.0.0",
+  "license": "ISC",
+  "scripts": {
+    "build:css": "tailwindcss -i ./css/input.css -o ./static/css/tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./css/input.css -o ./static/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.5",
+    "tailwindcss": "^3.4.13"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pmakashe/tendering_project_entry.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pmakashe/tendering_project_entry/issues"
+  },
+  "homepage": "https://github.com/pmakashe/tendering_project_entry#readme"
+}

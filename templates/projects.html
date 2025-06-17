@@ -5,12 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects - Tendering Project Entry</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" crossorigin="anonymous">
     <style>
         body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             background-color: #f4f7f6; /* Light gray background */
+            padding-top: 56px; /* Space for fixed navbar */
+        }
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1030;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         .main-content {
             flex: 1; /* Allows main content to grow and push footer down */
@@ -19,18 +28,18 @@
         }
         .navbar {
             background-color: #28a745; /* Green color for the navbar */
-            padding: 15px 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 8px 0; /* Adjusted for compactness */
+            box-shadow: none; /* Removed redundant shadow */
         }
         .navbar-brand {
             color: white !important;
-            font-size: 1.5rem;
+            font-size: 1.3rem; /* Adjusted for compactness */
             font-weight: bold;
         }
         .navbar-nav .nav-link {
             color: white !important;
-            margin-left: 20px;
-            font-size: 1.1rem;
+            margin-left: 10px; /* Adjusted for compactness */
+            font-size: 1rem; /* Adjusted for compactness */
         }
         .navbar-nav .nav-link:hover {
             text-decoration: underline;
@@ -93,26 +102,103 @@
         .filter-section .form-label {
             font-weight: bold;
         }
+        /* Styles for sortable columns */
+        .table th.sortable {
+            cursor: pointer;
+            position: relative;
+        }
+        .table th.sortable::after {
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            opacity: 0.4;
+        }
+        .table th.sortable.asc::after {
+            border-bottom: 5px solid white;
+            opacity: 1;
+        }
+        .table th.sortable.desc::after {
+            border-top: 5px solid white;
+            opacity: 1;
+        }
+        .table-header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .active-filters-container {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #e2e3e5;
+            border-radius: 5px;
+            min-height: 40px; /* Ensure it takes up space even if empty */
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .active-filter-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: .35em .65em;
+            font-size: .85em;
+            font-weight: 600;
+            line-height: 1;
+            color: #fff;
+            background-color: #007bff; /* Primary color */
+            border-radius: .25rem;
+        }
+        .active-filter-tag .btn-close {
+            font-size: .6em;
+            margin-left: .5em;
+            color: #fff;
+            opacity: .75;
+            filter: invert(1); /* To make the X white */
+        }
+        /* Custom hover for table rows (if default Bootstrap is not strong enough) */
+        .table-hover tbody tr:hover {
+            background-color: #e9ecef; /* Lighter gray on hover */
+        }
+        .pagination-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .pagination .page-link {
+            color: #28a745; /* Green for page links */
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark w-100">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/dashboard">Tendering Project Entry</a>
+                <a class="navbar-brand" href="/landing_page">Tendering Project Entry</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="/dashboard">Dashboard</a>
+                            <a class="nav-link" href="/project_dashboard">Project Dashboard</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/new_project">New Project Entry</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/projects_list">Projects</a>
+                            <a class="nav-link active" aria-current="page" href="/projects_list">Projects List</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -129,7 +215,7 @@
                     </ul>
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="/logout">Logout</a>
+                            <a class="nav-link" href="/signin">Logout</a>
                         </li>
                     </ul>
                 </div>
@@ -182,19 +268,27 @@
                 </div>
             </div>
 
+            <div class="active-filters-container" id="activeFiltersContainer">
+                <span class="text-muted" id="noFiltersMessage">No active filters.</span>
+            </div>
+
             <div class="card">
+                <div class="table-header-controls">
+                    <div id="projectsCountDisplay"></div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSorting()">Clear Sorting</button>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-striped" id="projectsTable">
                         <thead class="table-dark">
                             <tr>
-                                <th>Project ID</th>
-                                <th>Tender Name</th>
-                                <th>Company Name</th>
-                                <th>Entry Date</th>
-                                <th>Status</th>
-                                <th>Client</th>
-                                <th>Est. Cost (INR)</th>
-                                <th>Work Order Value (INR)</th>
+                                <th class="sortable" data-sort-by="project_id">Project ID</th>
+                                <th class="sortable" data-sort-by="tender_name">Tender Name</th>
+                                <th class="sortable" data-sort-by="company_name">Company Name</th>
+                                <th class="sortable" data-sort-by="tender_entry_date">Entry Date</th>
+                                <th class="sortable" data-sort-by="tender_status">Status</th>
+                                <th class="sortable" data-sort-by="name_of_client">Client</th>
+                                <th class="sortable" data-sort-by="tender_estimated_cost_inr">Est. Cost (INR)</th>
+                                <th class="sortable" data-sort-by="work_order_value_inr">Work Order Value (INR)</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -204,6 +298,21 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                 <div class="pagination-controls">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination mb-0" id="pagination">
+                            </ul>
+                    </nav>
+                    <div>
+                        <select id="itemsPerPage" class="form-select form-select-sm">
+                            <option value="5">5 per page</option>
+                            <option value="10" selected>10 per page</option>
+                            <option value="25">25 per page</option>
+                            <option value="50">50 per page</option>
+                            <option value="100">100 per page</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -216,20 +325,76 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
     <script>
         let allProjects = []; // Store all projects fetched from the API
+        let currentSortColumn = null;
+        let currentSortDirection = 'asc'; // 'asc' or 'desc'
+        let currentPage = 1;
+        let itemsPerPage = 10; // Default items per page
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Check for URL parameters on load
+            const urlParams = new URLSearchParams(window.location.search);
+            const statusParam = urlParams.get('status');
+            
+            if (statusParam) {
+                document.getElementById('statusFilter').value = statusParam;
+            }
+
             fetchProjects(); // Initial fetch when the page loads
 
-            document.getElementById('searchQuery').addEventListener('input', applyFiltersAndSearch);
-            document.getElementById('statusFilter').addEventListener('change', applyFiltersAndSearch);
-            document.getElementById('clientFilter').addEventListener('change', applyFiltersAndSearch);
+            document.getElementById('searchQuery').addEventListener('input', () => { currentPage = 1; applyFiltersAndSearch(); });
+            document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 1; applyFiltersAndSearch(); });
+            document.getElementById('clientFilter').addEventListener('change', () => { currentPage = 1; applyFiltersAndSearch(); });
+            document.getElementById('startDate').addEventListener('change', () => { currentPage = 1; applyFiltersAndSearch(); });
+            document.getElementById('endDate').addEventListener('change', () => { currentPage = 1; applyFiltersAndSearch(); });
+            document.getElementById('itemsPerPage').addEventListener('change', (event) => {
+                itemsPerPage = parseInt(event.target.value);
+                currentPage = 1; // Reset to first page when items per page changes
+                applyFiltersAndSearch();
+            });
+
+            // Add event listeners for sorting
+            document.querySelectorAll('#projectsTable thead th.sortable').forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sortBy;
+                    if (currentSortColumn === column) {
+                        currentSortDirection = (currentSortDirection === 'asc' ? 'desc' : 'asc');
+                    } else {
+                        currentSortColumn = column;
+                        currentSortDirection = 'asc';
+                    }
+                    // Remove current sort indicators
+                    document.querySelectorAll('#projectsTable thead th.sortable').forEach(th => {
+                        th.classList.remove('asc', 'desc');
+                    });
+                    // Add current sort indicator
+                    header.classList.add(currentSortDirection);
+                    currentPage = 1; // Reset to first page on new sort
+                    applyFiltersAndSearch(); // Re-apply filters and re-render with new sort order
+                });
+            });
         });
 
         async function fetchProjects() {
             try {
-                const response = await fetch('/api/projects/'); // Fetch all projects from your API
+                // Construct URL with current filters
+                const searchQuery = document.getElementById('searchQuery').value;
+                const statusFilter = document.getElementById('statusFilter').value;
+                const clientFilter = document.getElementById('clientFilter').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                const urlParams = new URLSearchParams();
+                if (searchQuery) urlParams.append('search_query', searchQuery);
+                if (statusFilter) urlParams.append('status', statusFilter);
+                if (clientFilter) urlParams.append('client', clientFilter);
+                if (startDate) urlParams.append('start_date', startDate);
+                if (endDate) urlParams.append('end_date', endDate);
+
+
+                const response = await fetch(`/api/projects/?${urlParams.toString()}`); // Fetch all projects from your API
                 if (response.status === 401) {
                     window.location.href = '/signin'; // Redirect to signin if not authenticated
                     return;
@@ -237,7 +402,7 @@
                 const data = await response.json();
                 allProjects = data; // Store fetched projects
                 populateClientFilter(); // Populate client filter options based on fetched data
-                applyFiltersAndSearch(); // Render table with all projects initially
+                applyFiltersAndSearch(); // Render table with all projects initially, applying any URL filters and sorting
             } catch (error) {
                 console.error('Error fetching projects:', error);
                 document.getElementById('projectsTableBody').innerHTML = `<tr><td colspan="9" class="text-center text-danger">Failed to load projects. Please try again.</td></tr>`;
@@ -246,6 +411,9 @@
 
         function populateClientFilter() {
             const clientFilter = document.getElementById('clientFilter');
+            // Store original value if coming from URL param
+            const originalValue = clientFilter.value; 
+
             clientFilter.innerHTML = '<option value="">All Clients</option>'; // Reset options
 
             const clients = new Set(allProjects.map(project => project.name_of_client).filter(Boolean)); // Get unique clients
@@ -255,40 +423,77 @@
                 option.textContent = client;
                 clientFilter.appendChild(option);
             });
+
+            // Restore original value if it was set
+            if (originalValue) {
+                clientFilter.value = originalValue;
+            }
         }
 
         window.applyFiltersAndSearch = () => {
-            const searchQuery = document.getElementById('searchQuery').value.toLowerCase();
+            const searchQuery = document.getElementById('searchQuery').value;
             const statusFilter = document.getElementById('statusFilter').value;
             const clientFilter = document.getElementById('clientFilter').value;
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
 
+            // This filtering logic is now redundant if the backend API supports filtering,
+            // but kept here for client-side refinement or if backend filtering is partial.
+            // For full backend filtering, you'd re-fetch here instead of filtering allProjects.
             let filteredProjects = allProjects.filter(project => {
-                // Search query
                 const matchesSearch = !searchQuery || 
-                                      project.project_id.toLowerCase().includes(searchQuery) ||
-                                      project.tender_name.toLowerCase().includes(searchQuery) ||
-                                      project.company_name.toLowerCase().includes(searchQuery) ||
-                                      project.name_of_client.toLowerCase().includes(searchQuery);
+                                      (project.project_id && project.project_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                                      (project.tender_name && project.tender_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                                      (project.company_name && project.company_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                                      (project.name_of_client && project.name_of_client.toLowerCase().includes(searchQuery.toLowerCase()));
 
-                // Status filter
                 const matchesStatus = !statusFilter || project.tender_status === statusFilter;
-
-                // Client filter
                 const matchesClient = !clientFilter || project.name_of_client === clientFilter;
-
-                // Date range filter
-                const entryDate = new Date(project.tender_entry_date);
+                const entryDate = project.tender_entry_date ? new Date(project.tender_entry_date) : null;
                 const start = startDate ? new Date(startDate) : null;
                 const end = endDate ? new Date(endDate) : null;
 
-                const matchesDate = (!start || entryDate >= start) && (!end || entryDate <= end);
+                const matchesDate = (!start || (entryDate && entryDate >= start)) && (!end || (entryDate && entryDate <= end));
 
                 return matchesSearch && matchesStatus && matchesClient && matchesDate;
             });
 
+            // Apply sorting if a column is selected
+            if (currentSortColumn) {
+                filteredProjects.sort((a, b) => {
+                    let valA = a[currentSortColumn];
+                    let valB = b[currentSortColumn];
+
+                    if (valA === null || valA === undefined) valA = '';
+                    if (valB === null || valB === undefined) valB = '';
+
+                    // Convert to numbers for numeric comparison if applicable
+                    if (typeof valA === 'string' && !isNaN(parseFloat(valA)) && typeof valB === 'string' && !isNaN(parseFloat(valB))) {
+                        valA = parseFloat(valA);
+                        valB = parseFloat(valB);
+                    }
+                    // Convert dates to timestamps for comparison
+                    if (currentSortColumn.includes('date') && typeof valA === 'string' && typeof valB === 'string') {
+                         valA = new Date(valA).getTime();
+                         valB = new Date(valB).getTime();
+                    }
+
+
+                    let comparison = 0;
+                    if (valA > valB) {
+                        comparison = 1;
+                    } else if (valA < valB) {
+                        comparison = -1;
+                    }
+
+                    return currentSortDirection === 'asc' ? comparison : -comparison;
+                });
+            }
+
             renderTable(filteredProjects);
+            updateProjectsCount(filteredProjects.length, allProjects.length);
+            renderPagination(filteredProjects.length);
+            updateActiveFilterTags();
         };
 
         window.resetFilters = () => {
@@ -297,29 +502,151 @@
             document.getElementById('clientFilter').value = '';
             document.getElementById('startDate').value = '';
             document.getElementById('endDate').value = '';
-            applyFiltersAndSearch(); // Re-apply filters with cleared values
+            clearSorting();
+            currentPage = 1;
+            // Now call fetchProjects again to re-fetch all data and then apply filters (which will be empty)
+            fetchProjects(); 
+        };
+
+        window.clearSorting = () => {
+            document.querySelectorAll('#projectsTable thead th.sortable').forEach(th => {
+                th.classList.remove('asc', 'desc');
+            });
+            currentSortColumn = null;
+            currentSortDirection = 'asc';
+            currentPage = 1;
+            applyFiltersAndSearch();
+        };
+
+        function updateProjectsCount(filteredCount, totalCount) {
+            const displayElement = document.getElementById('projectsCountDisplay');
+            if (filteredCount === totalCount) {
+                displayElement.textContent = `Showing ${totalCount} Projects`;
+            } else {
+                displayElement.textContent = `Showing ${filteredCount} of ${totalCount} Projects`;
+            }
+        }
+
+        function renderPagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const paginationUl = document.getElementById('pagination');
+            paginationUl.innerHTML = '';
+
+            if (totalPages <= 1) {
+                return;
+            }
+
+            let prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous" onclick="goToPage(${currentPage - 1})"><span aria-hidden="true">&laquo;</span></a>`;
+            paginationUl.appendChild(prevLi);
+
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                let li = document.createElement('li');
+                li.className = 'page-item';
+                li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(1)">1</a>`;
+                paginationUl.appendChild(li);
+                if (startPage > 2) {
+                    let ellipsis = document.createElement('li');
+                    ellipsis.className = 'page-item disabled';
+                    ellipsis.innerHTML = `<span class="page-link">...</span>`;
+                    paginationUl.appendChild(ellipsis);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                let li = document.createElement('li');
+                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${i})">${i}</a>`;
+                paginationUl.appendChild(li);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    let ellipsis = document.createElement('li');
+                    ellipsis.className = 'page-item disabled';
+                    ellipsis.innerHTML = `<span class="page-link">...</span>`;
+                    paginationUl.appendChild(ellipsis);
+                }
+                let li = document.createElement('li');
+                li.className = 'page-item';
+                li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${totalPages})">${totalPages}</a>`;
+                paginationUl.appendChild(li);
+            }
+
+            let nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next" onclick="goToPage(${currentPage + 1})"><span aria-hidden="true">&raquo;</span></a>`;
+            paginationUl.appendChild(nextLi);
+        }
+
+        window.goToPage = (page) => {
+            const totalItems = allProjects.filter(project => {
+                const searchQuery = document.getElementById('searchQuery').value;
+                const statusFilter = document.getElementById('statusFilter').value;
+                const clientFilter = document.getElementById('clientFilter').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                const matchesSearch = !searchQuery || 
+                                      (project.project_id && project.project_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                                      (project.tender_name && project.tender_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                                      (project.company_name && project.company_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                                      (project.name_of_client && project.name_of_client.toLowerCase().includes(searchQuery.toLowerCase()));
+
+                const matchesStatus = !statusFilter || project.tender_status === statusFilter;
+                const matchesClient = !clientFilter || project.name_of_client === clientFilter;
+                const entryDate = project.tender_entry_date ? new Date(project.tender_entry_date) : null;
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+
+                const matchesDate = (!start || (entryDate && entryDate >= start)) && (!end || (entryDate && entryDate <= end));
+
+                return matchesSearch && matchesStatus && matchesClient && matchesDate;
+            }).length;
+
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                applyFiltersAndSearch();
+            }
         };
 
         function renderTable(projectsToDisplay) {
             const tableBody = document.getElementById('projectsTableBody');
-            tableBody.innerHTML = ''; // Clear existing rows
+            tableBody.innerHTML = '';
 
             if (projectsToDisplay.length === 0) {
                 tableBody.innerHTML = `<tr><td colspan="9" class="text-center">No projects found.</td></tr>`;
                 return;
             }
 
-            projectsToDisplay.forEach(project => {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const projectsForCurrentPage = projectsToDisplay.slice(startIndex, endIndex);
+
+
+            if (projectsForCurrentPage.length === 0 && currentPage > 1) {
+                currentPage = 1;
+                applyFiltersAndSearch();
+                return;
+            }
+
+
+            projectsForCurrentPage.forEach(project => {
                 const row = tableBody.insertRow();
                 row.innerHTML = `
-                    <td>${project.project_id}</td>
-                    <td>${project.tender_name}</td>
-                    <td>${project.company_name}</td>
-                    <td>${project.tender_entry_date}</td>
-                    <td><span class="status-badge status-${project.tender_status.replace(/\s/g, '-') || 'default'}">${project.tender_status}</span></td>
-                    <td>${project.name_of_client}</td>
-                    <td>${project.tender_estimated_cost_inr ? project.tender_estimated_cost_inr.toLocaleString('en-IN') : 'N/A'}</td>
-                    <td>${project.work_order_value_inr ? project.work_order_value_inr.toLocaleString('en-IN') : 'N/A'}</td>
+                    <td>${project.project_id || 'N/A'}</td>
+                    <td>${project.tender_name || 'N/A'}</td>
+                    <td>${project.company_name || 'N/A'}</td>
+                    <td>${project.tender_entry_date ? new Date(project.tender_entry_date).toLocaleDateString('en-IN', {day: '2-digit', month: '2-digit', year: 'numeric'}) : 'N/A'}</td>
+                    <td><span class="status-badge status-${(project.tender_status || 'default').replace(/\s/g, '-') || 'default'}">${project.tender_status || 'N/A'}</span></td>
+                    <td>${project.name_of_client || 'N/A'}</td>
+                    <td>${project.tender_estimated_cost_inr ? parseFloat(project.tender_estimated_cost_inr).toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) : '₹0.00'}</td>
+                    <td>${project.work_order_value_inr ? parseFloat(project.work_order_value_inr).toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) : '₹0.00'}</td>
                     <td>
                         <button class="btn btn-info btn-sm" onclick="editProject('${project.project_id}')">Edit</button>
                         <button class="btn btn-warning btn-sm" onclick="changeStatus('${project.project_id}')">Change Status</button>
@@ -329,15 +656,71 @@
             });
         }
 
-        // --- Action Functions (now interacting with API) ---
+        function updateActiveFilterTags() {
+            const container = document.getElementById('activeFiltersContainer');
+            const noFiltersMessage = container.querySelector('#noFiltersMessage');
+            container.innerHTML = '';
+            
+            const filters = [];
+
+            const searchQuery = document.getElementById('searchQuery').value;
+            if (searchQuery) { filters.push({ type: 'searchQuery', value: searchQuery, label: `Keywords: "${searchQuery}"` }); }
+
+            const statusFilter = document.getElementById('statusFilter').value;
+            if (statusFilter) { filters.push({ type: 'statusFilter', value: statusFilter, label: `Status: ${statusFilter}` }); }
+
+            const clientFilter = document.getElementById('clientFilter').value;
+            if (clientFilter) { filters.push({ type: 'clientFilter', value: clientFilter, label: `Client: ${clientFilter}` }); }
+
+            const startDate = document.getElementById('startDate').value;
+            if (startDate) { filters.push({ type: 'startDate', value: startDate, label: `From: ${startDate}` }); }
+
+            const endDate = document.getElementById('endDate').value;
+            if (endDate) { filters.push({ type: 'endDate', value: endDate, label: `To: ${endDate}` }); }
+
+
+            if (filters.length === 0) {
+                container.appendChild(noFiltersMessage);
+                noFiltersMessage.style.display = 'inline';
+            } else {
+                noFiltersMessage.style.display = 'none';
+                filters.forEach(filter => {
+                    const tag = document.createElement('span');
+                    tag.className = 'active-filter-tag me-2';
+                    tag.innerHTML = `${filter.label} <button type="button" class="btn-close" aria-label="Remove filter" data-filter-type="${filter.type}" data-filter-value="${filter.value}"></button>`;
+                    container.appendChild(tag);
+                });
+            }
+
+            container.querySelectorAll('.btn-close').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const filterType = event.target.dataset.filterType;
+                    if (filterType === 'searchQuery') { document.getElementById('searchQuery').value = ''; }
+                    else if (filterType === 'statusFilter') { document.getElementById('statusFilter').value = ''; }
+                    else if (filterType === 'clientFilter') { document.getElementById('clientFilter').value = ''; }
+                    else if (filterType === 'startDate') { document.getElementById('startDate').value = ''; }
+                    else if (filterType === 'endDate') { document.getElementById('endDate').value = ''; }
+                    
+                    applyFiltersAndSearch();
+                });
+            });
+        }
+
 
         window.editProject = (id) => {
-            window.location.href = `/edit_project/${id}`; // Redirect to the new edit page
+            window.location.href = `/edit_project/${id}`;
         };
 
         window.changeStatus = async (id) => {
-            const newStatus = prompt(`Change status for ${id}. Enter new status (e.g., Yet to Submit, Submitted, Awarded, Lost, Cancelled, On Hold):`);
+            const allowedStatuses = ["Yet to Submit", "Submitted", "Awarded", "Lost", "Cancelled", "On Hold"];
+            let newStatus = prompt(`Change status for ${id}. Enter new status:\n${allowedStatuses.join(', ')}`);
+            
             if (newStatus) {
+                newStatus = newStatus.trim();
+                if (!allowedStatuses.includes(newStatus)) {
+                    alert(`Invalid status: "${newStatus}". Please choose from: ${allowedStatuses.join(', ')}.`);
+                    return;
+                }
                 try {
                     const response = await fetch(`/api/projects/${id}?tender_status=${encodeURIComponent(newStatus)}`, {
                         method: 'PUT',
@@ -347,7 +730,7 @@
                     });
                     if (response.ok) {
                         alert(`Status for ${id} changed to ${newStatus} successfully!`);
-                        fetchProjects(); // Re-fetch all projects to update the table
+                        fetchProjects();
                     } else if (response.status === 401) {
                          window.location.href = '/signin';
                     }
@@ -370,7 +753,7 @@
                     });
                     if (response.ok) {
                         alert(`Project ${id} deleted successfully!`);
-                        fetchProjects(); // Re-fetch all projects to update the table
+                        fetchProjects();
                     } else if (response.status === 401) {
                          window.location.href = '/signin';
                     }
@@ -384,6 +767,23 @@
                 }
             }
         };
-    </script>
+    </script>
 </body>
-</html>
+</html>"
+
+I see the code for `project_dashboard.html` you provided. You're reporting that after clicking "Project List" from this dashboard, you get a "Not Found" error.
+
+Let's break this down:
+
+**1. Verification of `projects_list` link in `project_dashboard.html`:**
+
+In your `project_dashboard.html` code (which you provided above), the links for the summary cards that lead to `projects_list` are:
+
+```html
+<a href="/projects_list?status=Yet+to+Submit" class="card card-dashboard ...">
+...
+<a href="/projects_list?status=Submitted" class="card card-dashboard ...">
+...
+<a href="/projects_list?status=Awarded" class="card card-dashboard ...">
+...
+<a href="/projects_list" class="card card-dashboard ...">

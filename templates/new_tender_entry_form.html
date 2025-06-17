@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tendering Project Entry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding-top: 56px; /* Space for fixed navbar */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1030;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .main-content {
+            flex: 1;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        .navbar {
+            background-color: #28a745;
+            padding: 8px 0; /* Adjusted for compactness */
+            box-shadow: none;
+        }
+        .navbar-brand {
+            color: white !important;
+            font-size: 1.3rem; /* Adjusted for compactness */
+            font-weight: bold;
+        }
+        .navbar-nav .nav-link {
+            color: white !important;
+            margin-left: 10px; /* Adjusted for compactness */
+            font-size: 1rem; /* Adjusted for compactness */
+        }
+        .navbar-nav .nav-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            margin-top: auto;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
+            margin-top: 0;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group input[type="datetime-local"],
+        .form-group input[type="file"],
+        .form-group select,
+        .form-group textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .form-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+        }
+        .form-column {
+            flex: 1;
+            min-width: 400px;
+        }
+        fieldset {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            background-color: #fcfcfc;
+        }
+        legend {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+            padding: 0 10px;
+            margin-left: 10px;
+            border-bottom: none;
+            width: auto;
+        }
+        .btn-submit {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+        .response-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            display: {% if error_message or success_message %}block{% else %}none{% endif %};
+        }
+        .response-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .response-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .required-asterisk {
+            color: red;
+            margin-left: 5px;
+        }
+        /* Bootstrap validation styles */
+        .form-control.is-invalid, .form-select.is-invalid, .form-check-input.is-invalid {
+            border-color: #dc3545 !important;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right calc(.375em + .1875rem) center !important;
+            background-size: calc(.75em + .375rem) calc(.75em + .375rem) !important;
+        }
+        .invalid-feedback {
+            display: block; /* Override Bootstrap default hidden state */
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/landing_page">Tendering Project Entry</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/project_dashboard">Project Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/new_project">New Project Entry</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/projects_list">Projects List</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                More
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/reports">Reports</a></li>
+                                <li><a class="dropdown-item" href="/analytics">Analytics</a></li>
+                                <li><a class="dropdown-item" href="/user_management">User Management</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/signin">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <h2>New Tendering Project Entry</h2>
+            <div id="generalResponseMessage" class="response-message {% if error_message %}error{% elif success_message %}success{% endif %}">
+                {% if error_message %}{{ error_message }}{% elif success_message %}{{ success_message }}{% endif %}
+            </div>
+            <form id="projectForm" method="POST" action="/projects/" enctype="multipart/form-data" novalidate>
+                <div class="form-columns">
+                    <div class="form-column">
+                        <fieldset>
+                            <legend>Project General Information</legend>
+                            <div class="form-group">
+                                <label for="project_id">Project ID:<span class="required-asterisk">*</span></label>
+                                <input type="text" class="form-control" id="project_id" name="project_id" value="{{ next_project_id }}" readonly required>
+                                <div class="invalid-feedback" id="project_id_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="tender_entry_date">Tender Entry Date and Time:<span class="required-asterisk">*</span></label>
+                                <input type="datetime-local" class="form-control" id="tender_entry_date" name="tender_entry_date_str" value="{{ current_datetime_str }}" readonly>
+                                <div class="invalid-feedback" id="tender_entry_date_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="project_name">Project Name:<span class="required-asterisk">*</span></label>
+                                <input type="text" class="form-control" id="project_name" name="tender_name" required>
+                                <div class="invalid-feedback" id="tender_name_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="company_name">Company Name:<span class="required-asterisk">*</span></label>
+                                <select class="form-select" id="company_name" name="company_name" required>
+                                    <option value="">Select Company</option>
+                                    <option value="UNIVASTU">UNIVASTU</option>
+                                    <option value="UBILLP">UBILLP</option>
+                                    <option value="Autofina Robotics">Autofina Robotics</option>
+                                </select>
+                                <div class="invalid-feedback" id="company_name_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="tender_status">Tender Status:<span class="required-asterisk">*</span></label>
+                                <select class="form-select" id="tender_status" name="tender_status" required>
+                                    <option value="">Select Status</option>
+                                    <option value="Yet to Submit">Yet to Submit</option>
+                                    <option value="Submitted">Submitted</option>
+                                    <option value="Awarded">Awarded</option>
+                                    <option value="Lost">Lost</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="On Hold">On Hold</option>
+                                </select>
+                                <div class="invalid-feedback" id="tender_status_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="name_of_client">Name of Client:<span class="required-asterisk">*</span></label>
+                                <input type="text" class="form-control" id="name_of_client" name="name_of_client" required>
+                                <div class="invalid-feedback" id="name_of_client_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State:<span class="required-asterisk">*</span></label>
+                                <select class="form-select" id="state" name="state" required>
+                                    <option value="">Select State</option>
+                                    <option value="Gujarat">Gujarat</option>
+                                    <option value="Karnataka">Karnataka</option>
+                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Rajasthan">Rajasthan</option>
+                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                </select>
+                                <div class="invalid-feedback" id="state_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="project_type">Project Type:<span class="required-asterisk">*</span></label>
+                                <select class="form-select" id="project_type" name="project_type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Road">Road</option>
+                                    <option value="Building">Building</option>
+                                    <option value="Water Supply">Water Supply</option>
+                                    <option value="Sports Complex">Sports Complex</option>
+                                    <option value="Metro">Metro</option>
+                                    <option value="Commercial">Commercial</option>
+                                </select>
+                                <div class="invalid-feedback" id="project_type_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="tender_id">Tender ID (Optional):</label>
+                                <input type="text" class="form-control" id="tender_id" name="tender_id">
+                                <div class="invalid-feedback" id="tender_id_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="attch_tender_document">Attach Tender Document (PDF/DOC):</label>
+                                <input type="file" class="form-control" id="attch_tender_document" name="attch_tender_document" accept=".pdf,.doc,.docx">
+                                <div class="invalid-feedback" id="attch_tender_document_feedback"></div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="form-column">
+                        <fieldset>
+                            <legend>Tender Financials</legend>
+                            <div class="form-group">
+                                <label for="tender_estimated_cost">Tender Estimated Cost (INR):<span class="required-asterisk">*</span></label>
+                                <input type="number" class="form-control" id="tender_estimated_cost" name="tender_estimated_cost" step="0.01" required>
+                                <div class="invalid-feedback" id="tender_estimated_cost_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="completion_period_month">Completion Period (Months):<span class="required-asterisk">*</span></label>
+                                <input type="number" class="form-control" id="completion_period_month" name="completion_period_month_str" required>
+                                <div class="invalid-feedback" id="completion_period_month_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="tender_submission_date">Tender Submission Date:<span class="required-asterisk">*</span></label>
+                                <input type="date" class="form-control" id="tender_submission_date" name="tender_submission_date_str" required>
+                                <div class="invalid-feedback" id="tender_submission_date_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="tender_opening_date">Tender Opening Date:</label>
+                                <input type="date" class="form-control" id="tender_opening_date" name="tender_opening_date_str">
+                                <div class="invalid-feedback" id="tender_opening_date_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="pre_bid_meeting_date">Pre-Bid Meeting Date:</label>
+                                <input type="date" class="form-control" id="pre_bid_meeting_date" name="pre_bid_meeting_date_str">
+                                <div class="invalid-feedback" id="pre_bid_meeting_date_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="clarifications_issued_date">Clarifications Issued Date:</label>
+                                <input type="date" class="form-control" id="clarifications_issued_date" name="clarifications_issued_date_str">
+                                <div class="invalid-feedback" id="clarifications_issued_date_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="corrigendum_received_date">Corrigendum Received Date:</label>
+                                <input type="date" class="form-control" id="corrigendum_received_date" name="corrigendum_received_date_str">
+                                <div class="invalid-feedback" id="corrigendum_received_date_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="emd_required_inr">EMD Required (INR):<span class="required-asterisk">*</span></label>
+                                <input type="number" class="form-control" id="emd_required_inr" name="emd_required_inr_str" step="0.01" required>
+                                <div class="invalid-feedback" id="emd_required_inr_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="emd_paid_inr">EMD Paid (INR):</label>
+                                <input type="number" class="form-control" id="emd_paid_inr" name="emd_paid_inr_str" step="0.01">
+                                <div class="invalid-feedback" id="emd_paid_inr_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="emd_instrument_type">EMD Instrument Type:</label>
+                                <select class="form-select" id="emd_instrument_type" name="emd_instrument_type">
+                                    <option value="">Select Type</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="BG">BG</option>
+                                    <option value="FDR">FDR</option>
+                                    <option value="DD">DD</option>
+                                </select>
+                                <div class="invalid-feedback" id="emd_instrument_type_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="emd_bg_details_bg_number">EMD BG Number:</label>
+                                <input type="text" class="form-control" id="emd_bg_details_bg_number" name="emd_bg_details_bg_number">
+                                <div class="invalid-feedback" id="emd_bg_details_bg_number_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="emd_bg_details_bank_name">EMD BG Bank Name:</label>
+                                <input type="text" class="form-control" id="emd_bg_details_bank_name" name="emd_bg_details_bank_name">
+                                <div class="invalid-feedback" id="emd_bg_details_bank_name_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="emd_bg_details_bg_expiry_date">EMD BG Expiry Date:</label>
+                                <input type="date" class="form-control" id="emd_bg_details_bg_expiry_date" name="emd_bg_details_bg_expiry_date_str">
+                                <div class="invalid-feedback" id="emd_bg_details_bg_expiry_date_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="emd_return_date">EMD Return Date:</label>
+                                <input type="date" class="form-control" id="emd_return_date" name="emd_return_date_str">
+                                <div class="invalid-feedback" id="emd_return_date_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="sd_required_percent">SD Required (%):</label>
+                                <input type="number" class="form-control" id="sd_required_percent" name="sd_required_percent_str" step="0.01">
+                                <div class="invalid-feedback" id="sd_required_percent_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="sd_required_inr">SD Required (INR):</label>
+                                <input type="number" class="form-control" id="sd_required_inr" name="sd_required_inr_str" step="0.01">
+                                <div class="invalid-feedback" id="sd_required_inr_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="sd_instrument_type">SD Instrument Type:</label>
+                                <select class="form-select" id="sd_instrument_type" name="sd_instrument_type">
+                                    <option value="">Select Type</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="BG">BG</option>
+                                    <option value="FDR">FDR</option>
+                                    <option value="DD">DD</option>
+                                </select>
+                                <div class="invalid-feedback" id="sd_instrument_type_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="pbg_required_percent">PBG Required (%):</label>
+                                <input type="number" class="form-control" id="pbg_required_percent" name="pbg_required_percent_str" step="0.01">
+                                <div class="invalid-feedback" id="pbg_required_percent_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="pbg_required_inr">PBG Required (INR):</label>
+                                <input type="number" class="form-control" id="pbg_required_inr" name="pbg_required_inr_str" step="0.01">
+                                <div class="invalid-feedback" id="pbg_required_inr_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="pbg_instrument_type">PBG Instrument Type:</label>
+                                <select class="form-select" id="pbg_instrument_type" name="pbg_instrument_type">
+                                    <option value="">Select Type</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="BG">BG</option>
+                                    <option value="FDR">FDR</option>
+                                    <option value="DD">DD</option>
+                                </select>
+                                <div class="invalid-feedback" id="pbg_instrument_type_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="competition_no_of_bidders">Competition (No. of Bidders):</label>
+                                <input type="number" class="form-control" id="competition_no_of_bidders" name="competition_no_of_bidders_str">
+                                <div class="invalid-feedback" id="competition_no_of_bidders_str_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="final_status_of_tender">Final Status of Tender:</label>
+                                <select class="form-select" id="final_status_of_tender" name="final_status_of_tender">
+                                    <option value="">Select Status</option>
+                                    <option value="To Be Submitted">To Be Submitted</option>
+                                    <option value="Awarded">Awarded</option>
+                                    <option value="Study">Study</option>
+                                    <option value="Submitted">Submitted</option>
+                                    <option value="Financial Opened">Financial Opened</option>
+                                    <option value="Technical Opened">Technical Opened</option>
+                                    <option value="Not Submitted">Not Submitted</option>
+                                    <option value="Withdrawn">Withdrawn</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                                <div class="invalid-feedback" id="final_status_of_tender_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="remark">Remark:</label>
+                                <textarea class="form-control" id="remark" name="remark" rows="3"></textarea>
+                                <div class="invalid-feedback" id="remark_feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description:</label>
+                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                                <div class="invalid-feedback" id="description_feedback"></div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Submit Project</button>
+            </form>
+        </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const projectForm = document.getElementById('projectForm');
+            const generalResponseMessageDiv = document.getElementById('generalResponseMessage');
+
+            if (generalResponseMessageDiv.textContent.trim() === '') {
+                generalResponseMessageDiv.style.display = 'none';
+            }
+
+            projectForm.addEventListener('submit', async function(event) {
+                event.preventDefault(); // Prevent default form submission
+
+                // Clear previous validation feedback
+                clearValidationFeedback();
+
+                generalResponseMessageDiv.style.display = 'none';
+                generalResponseMessageDiv.classList.remove('success', 'error');
+                generalResponseMessageDiv.textContent = '';
+
+                const formData = new FormData(projectForm);
+
+                try {
+                    const response = await fetch('/projects/', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (response.redirected) {
+                        // If FastAPI sent a RedirectResponse (e.g., on successful project creation)
+                        window.location.href = response.url;
+                        return; // IMPORTANT: Exit here to prevent further processing of the fetch promise
+                    } else {
+                        // This block is for handling non-redirecting responses (e.g., validation errors)
+                        const result = await response.json(); // Attempt to parse JSON response
+                        generalResponseMessageDiv.classList.add('error');
+                        let errorMessage = 'An unknown error occurred.';
+
+                        if (response.status === 422 && result && Array.isArray(result.detail)) {
+                            // Handle FastAPI validation errors (422 Unprocessable Entity)
+                            result.detail.forEach(error => {
+                                const fieldName = error.loc[error.loc.length - 1]; // Get the last part of the 'loc' array
+                                
+                                // Map backend parameter names to frontend form field names
+                                let targetFieldName = fieldName;
+                                if (fieldName === 'project_name') targetFieldName = 'tender_name';
+                                else if (fieldName === 'tender_estimated_cost_inr_str') targetFieldName = 'tender_estimated_cost';
+                                else if (fieldName === 'completion_period_month_str') targetFieldName = 'completion_period_month';
+                                else if (fieldName === 'tender_submission_date_str') targetFieldName = 'tender_submission_date';
+                                else if (fieldName === 'tender_opening_date_str') targetFieldName = 'tender_opening_date';
+                                else if (fieldName === 'pre_bid_meeting_date_str') targetFieldName = 'pre_bid_meeting_date';
+                                else if (fieldName === 'clarifications_issued_date_str') targetFieldName = 'clarifications_issued_date';
+                                else if (fieldName === 'corrigendum_received_date_str') targetFieldName = 'corrigendum_received_date';
+                                else if (fieldName === 'emd_required_inr_str') targetFieldName = 'emd_required_inr';
+                                else if (fieldName === 'emd_paid_inr_str') targetFieldName = 'emd_paid_inr';
+                                else if (fieldName === 'emd_bg_details_bg_expiry_date_str') targetFieldName = 'emd_bg_details_bg_expiry_date';
+                                else if (fieldName === 'emd_return_date_str') targetFieldName = 'emd_return_date';
+                                else if (fieldName === 'sd_required_percent_str') targetFieldName = 'sd_required_percent';
+                                else if (fieldName === 'sd_required_inr_str') targetFieldName = 'sd_required_inr';
+                                else if (fieldName === 'pbg_required_percent_str') targetFieldName = 'pbg_required_percent';
+                                else if (fieldName === 'pbg_required_inr_str') targetFieldName = 'pbg_required_inr';
+                                else if (fieldName === 'competition_no_of_bidders_str') targetFieldName = 'competition_no_of_bidders';
+                                else if (fieldName === 'description') targetFieldName = 'description';
+                                else if (fieldName === 'tender_entry_date_str') targetFieldName = 'tender_entry_date';
+                                else if (fieldName === 'tender_fees_paid_inr_str') targetFieldName = 'tender_fees_paid_inr';
+                                else if (fieldName === 'work_order_value_inr_str') targetFieldName = 'work_order_value_inr';
+                                else if (fieldName === 'work_completion_date_str') targetFieldName = 'work_completion_date';
+
+
+                                const targetFieldElement = document.querySelector(`[name="${targetFieldName}"]`);
+                                const targetFeedbackElement = document.getElementById(`${targetFieldName}_feedback`);
+
+                                if (targetFieldElement) {
+                                    targetFieldElement.classList.add('is-invalid');
+                                }
+                                if (targetFeedbackElement) {
+                                    targetFeedbackElement.textContent = error.msg;
+                                }
+                            });
+                            errorMessage = 'Please correct the errors in the form.';
+                        } else if (result && result.detail) {
+                            errorMessage = String(result.detail);
+                        }
+                        generalResponseMessageDiv.innerHTML = errorMessage;
+                        generalResponseMessageDiv.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                    generalResponseMessageDiv.classList.add('error');
+                    generalResponseMessageDiv.textContent = 'An unexpected issue occurred. The project might have been saved. Please check the projects list or try again.';
+                    generalResponseMessageDiv.style.display = 'block';
+                }
+            });
+
+            // Function to clear all validation feedback
+            function clearValidationFeedback() {
+                document.querySelectorAll('.is-invalid').forEach(element => {
+                    element.classList.remove('is-invalid');
+                });
+                document.querySelectorAll('.invalid-feedback').forEach(feedback => {
+                    feedback.textContent = '';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

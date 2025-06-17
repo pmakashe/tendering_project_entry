@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Tasks - Tendering Project Entry</title>
+    <link href="/static/css/tailwind.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-gray-800 text-white p-4 flex flex-col">
+        <div class="flex items-center mb-6">
+            <a href="/landing_page" class="text-white focus:outline-none mr-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
+            <h1 class="text-xl font-bold">Tendering Project Entry</h1>
+        </div>
+        <nav class="flex-1">
+            <ul class="space-y-2">
+                <li><a href="/home" class="block py-2 px-4 hover:bg-gray-700 rounded">Home</a></li>
+                <li><a href="/all_tasks" class="block py-2 px-4 hover:bg-gray-700 rounded">All Tasks</a></li>
+                <li><a href="/my_tasks" class="block py-2 px-4 hover:bg-gray-700 rounded">My Tasks</a></li>
+                <li><a href="/reports" class="block py-2 px-4 hover:bg-gray-700 rounded">Reports</a></li>
+                <li><a href="/projects" class="block py-2 px-4 hover:bg-gray-700 rounded">Projects</a></li>
+            </ul>
+        </nav>
+        <a href="/signin" class="block py-2 px-4 hover:bg-gray-700 rounded text-center mt-auto">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-6 overflow-y-auto">
+        <h2 class="text-2xl font-bold mb-4">All Tasks</h2>
+        <div class="mb-4">
+            <input type="text" id="searchInput" placeholder="Search tasks..." class="w-full p-2 rounded-lg border border-gray-300 md:w-1/2">
+        </div>
+        <div id="tableContainer" class="bg-white shadow rounded-lg overflow-hidden">
+            <table class="w-full text-left" id="taskTable">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="p-3 cursor-pointer" onclick="sortTable(0)">Project<span id="sortProject" class="ml-1"></span></th>
+                        <th class="p-3 cursor-pointer" onclick="sortTable(1)">Task Name<span id="sortTask" class="ml-1"></span></th>
+                        <th class="p-3 cursor-pointer" onclick="sortTable(2)">Assignee<span id="sortAssignee" class="ml-1"></span></th>
+                        <th class="p-3 cursor-pointer" onclick="sortTable(3)">Due Date<span id="sortDueDate" class="ml-1"></span></th>
+                        <th class="p-3 cursor-pointer" onclick="sortTable(4)">Status<span id="sortStatus" class="ml-1"></span></th>
+                    </tr>
+                </thead>
+                <tbody id="taskTableBody">
+                    <!-- Dynamic data will be inserted here -->
+                </tbody>
+            </table>
+            <p id="noDataMessage" class="p-4 text-center text-gray-500 hidden">No tasks available.</p>
+        </div>
+    </div>
+
+    <script>
+        let sortDirection = {};
+        async function fetchTasks() {
+            try {
+                const response = await fetch('/api/daily_work_summary');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                const tasks = data.raw_entries || [];
+
+                const tbody = document.getElementById('taskTableBody');
+                const noDataMessage = document.getElementById('noDataMessage');
+                tbody.innerHTML = '';
+
+                if (tasks.length === 0) {
+                    noDataMessage.classList.remove('hidden');
+                    noDataMessage.textContent = 'No tasks available or server error.';
+                    return;
+                } else {
+                    noDataMessage.classList.add('hidden');
+                }
+
+                tasks.forEach(task => {
+                    const row = document.createElement('tr');
+                    row.classList.add('border-b');
+                    row.innerHTML = `
+                        <td class="p-3">${task.name_of_project || 'N/A'}</td>
+                        <td class="p-3">${task.activity_name || 'N/A'}</td>
+                        <td class="p-3">${task.allocated_to || 'Unassigned'}</td>
+                        <td class="p-3">${task.due_date ? new Date(task.due_date).toLocaleDateString() : 'N/A'}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-1 rounded ${
+                                task.status_summary === 'Completed' ? 'bg-green-200 text-green-800' :
+                                task.status_summary === 'In Progress' ? 'bg-yellow-200 text-yellow-800' :
+                                'bg-red-200 text-red-800'
+                            }">${task.status_summary || 'Not Started'}</span>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+                const tbody = document.getElementById('taskTableBody');
+                tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-red-500">Error loading tasks. Server returned: ' + error.message + '. Check terminal for details.</td></tr>';
+            }
+        }
+
+        function sortTable(columnIndex) {
+            const tbody = document.getElementById('taskTableBody');
+            const rows = Array.from(tbody.getElementsByTagName('tr'));
+            const headers = ['sortProject', 'sortTask', 'sortAssignee', 'sortDueDate', 'sortStatus'];
+            const sortIcons = {
+                'asc': '↑',
+                'desc': '↓',
+                'none': ''
+            };
+
+            // Reset all sort indicators
+            headers.forEach(header => document.getElementById(header).textContent = '');
+
+            // Toggle sort direction
+            sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+            document.getElementById(headers[columnIndex]).textContent = sortIcons[sortDirection[columnIndex]];
+
+            rows.sort((a, b) => {
+                const aValue = a.cells[columnIndex].textContent.trim();
+                const bValue = b.cells[columnIndex].textContent.trim();
+                if (columnIndex === 3) { // Due Date
+                    return sortDirection[columnIndex] === 'asc' 
+                        ? new Date(aValue) - new Date(bValue) 
+                        : new Date(bValue) - new Date(aValue);
+                }
+                return sortDirection[columnIndex] === 'asc' 
+                    ? aValue.localeCompare(bValue) 
+                    : bValue.localeCompare(aValue);
+            });
+
+            // Re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#taskTableBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Fetch tasks when the page loads
+        window.addEventListener('load', fetchTasks);
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project List - Tendering Project Entry</title>
+    <link href="/static/css/tailwind.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-gray-800 text-white p-4 flex flex-col">
+        <div class="flex items-center mb-6">
+            <a href="/landing_page" class="text-white focus:outline-none mr-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
+            <h1 class="text-xl font-bold">Tendering Project Entry</h1>
+        </div>
+        <nav class="flex-1">
+            <ul class="space-y-2">
+                <li><a href="/home" class="block py-2 px-4 hover:bg-gray-700 rounded">Home</a></li>
+                <li><a href="/all_tasks" class="block py-2 px-4 hover:bg-gray-700 rounded">All Tasks</a></li>
+                <li><a href="/my_tasks" class="block py-2 px-4 hover:bg-gray-700 rounded">My Tasks</a></li>
+                <li><a href="/reports" class="block py-2 px-4 hover:bg-gray-700 rounded">Reports</a></li>
+                <li><a href="/projects" class="block py-2 px-4 hover:bg-gray-700 rounded">Projects</a></li>
+            </ul>
+        </nav>
+        <a href="/signin" class="block py-2 px-4 hover:bg-gray-700 rounded text-center mt-auto">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-6 overflow-y-auto">
+        <h2 class="text-2xl font-bold mb-4">Project List</h2>
+        <div class="mb-4">
+            <input type="text" id="searchInput" placeholder="Search projects..." class="w-full p-2 rounded-lg border border-gray-300 md:w-1/2">
+        </div>
+        <div id="tableContainer" class="bg-white shadow rounded-lg overflow-hidden">
+            <table class="w-full text-left" id="projectTable">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="p-3">Project Id</th>
+                        <th class="p-3">Tender Name</th>
+                        <th class="p-3">Company Name</th>
+                        <th class="p-3">Entry Date</th>
+                        <th class="p-3">Status</th>
+                        <th class="p-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="projectTableBody">
+                    <!-- Dynamic data will be inserted here -->
+                </tbody>
+            </table>
+            <p id="noDataMessage" class="p-4 text-center text-gray-500 hidden">No projects available.</p>
+        </div>
+    </div>
+
+    <script>
+        async function fetchProjects() {
+            try {
+                const response = await fetch('/api/projects/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const projects = await response.json();
+
+                const tbody = document.getElementById('projectTableBody');
+                const noDataMessage = document.getElementById('noDataMessage');
+                tbody.innerHTML = '';
+
+                if (projects.length === 0) {
+                    noDataMessage.classList.remove('hidden');
+                    return;
+                } else {
+                    noDataMessage.classList.add('hidden');
+                }
+
+                projects.forEach(project => {
+                    const row = document.createElement('tr');
+                    row.classList.add('border-b');
+                    row.innerHTML = `
+                        <td class="p-3">${project.project_id || 'N/A'}</td>
+                        <td class="p-3">${project.tender_name || 'N/A'}</td>
+                        <td class="p-3">${project.company_name || 'N/A'}</td>
+                        <td class="p-3">${project.tender_entry_date ? new Date(project.tender_entry_date).toLocaleDateString() : 'N/A'}</td>
+                        <td class="p-3">${project.tender_status || 'N/A'}</td>
+                        <td class="p-3">
+                            <button onclick="openPrequalificationForm('${project.project_id}')" class="text-blue-500 hover:underline">Prequalification</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching projects:', error);
+                const tbody = document.getElementById('projectTableBody');
+                tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-red-500">Error loading projects. Check console for details.</td></tr>';
+            }
+        }
+
+        function openPrequalificationForm(projectId) {
+            window.location.href = `/prequalification_form?project_id=${projectId}`;
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#projectTableBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Fetch projects when the page loads
+        window.addEventListener('load', fetchTasks);
+    </script>
+</body>
+</html>
