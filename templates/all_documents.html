@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Documents</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .table th, .table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .table th:first-child, .table td:first-child {
+            width: 120px; /* Adjusted for longer Sr. No. format */
+        }
+        .table th:nth-child(2), .table td:nth-child(2) {
+            width: 200px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-md">
+            <div class="p-4">
+                <h1 class="text-xl font-bold">Your Company Name</h1>
+                <p class="text-sm text-gray-600">123 Company Street</p>
+            </div>
+            <div class="p-4">
+                <p class="text-sm font-semibold">Welcome, User!</p>
+                <nav class="mt-4">
+                    <a href="/project_dashboard" class="block py-2 px-4 text-gray-700 hover:bg-gray-200">Project Dashboard</a>
+                    <a href="/tender_search" class="block py-2 px-4 text-gray-700 hover:bg-gray-200">Tender Search</a>
+                    <a href="/daily_work_status_dashboard" class="block py-2 px-4 text-gray-700 hover:bg-gray-200">Daily Work Status</a>
+                    <a href="/all_tasks" class="block py-2 px-4 text-gray-700 hover:bg-gray-200">Task</a>
+                    <a href="#" class="block py-2 px-4 text-gray-700 hover:bg-gray-200">Tab 5 (Coming Soon)</a>
+                    <div class="relative">
+                        <button class="block py-2 px-4 text-gray-700 hover:bg-gray-200 w-full text-left">More</button>
+                        <div class="hidden absolute bg-white shadow-md w-full">
+                            <a href="/reports" class="block py-2 px-4 text-gray-700 hover:bg-gray-200">Reports</a>
+                            <a href="/analytics" class="block py-2 px-4 text-gray-700 hover:bg-gray-200">Analytics</a>
+                            <a href="/user_management" class="block py-2 px-4 text-gray-700 hover:bg-gray-200">User Management</a>
+                            <a href="/settings" class="block py-2 px-4 text-gray-700 hover:bg-gray-200">Settings</a>
+                        </div>
+                    </div>
+                    <a href="/company_documents" class="block py-2 px-4 text-gray-700 bg-gray-200 font-semibold">Company Documents</a>
+                    <a href="/signin" class="block py-2 px-4 text-gray-700 hover:bg-gray-200">Logout</a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8 overflow-auto">
+            <h2 class="text-2xl font-bold mb-4">All Documents</h2>
+            <p class="text-gray-600 mb-6">View the list of all saved company documents.</p>
+
+            <!-- Navigation Button -->
+            <div class="mb-6">
+                <a href="/company_documents" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Back to Company Documents</a>
+            </div>
+
+            <!-- Documents Table -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <table class="table w-full">
+                    <thead>
+                        <tr>
+                            <th>Sr. No.</th>
+                            <th>Documents</th>
+                            <th>Issued On</th>
+                            <th>Valid Upto</th>
+                            <th>Details</th>
+                            <th>Files</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="documentsTable">
+                        <!-- Populated dynamically via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white p-4 text-center text-gray-600">
+        © {{ current_year }} Tendering Project Entry. All rights reserved.
+    </footer>
+
+    <script>
+        // View document
+        async function viewDocument(id) {
+            try {
+                const response = await fetch(`/api/company_documents/${id}`);
+                const doc = await response.json();
+                if (response.ok) {
+                    alert(`Document Details:\nSr. No.: ${doc.sr_no}\nName: ${doc.document_name}\nIssued On: ${doc.issued_on || '-'}\nValid Upto: ${doc.valid_upto || '-'}\nDetails: ${doc.details || '-'}`);
+                } else {
+                    alert('Failed to fetch document: ' + (doc.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error fetching document: ' + error.message);
+            }
+        }
+
+        // Modify document
+        async function modifyDocument(id) {
+            try {
+                const response = await fetch(`/api/company_documents/${id}`);
+                const doc = await response.json();
+                if (response.ok) {
+                    // Pre-fill form for modification (navigate to company_documents page)
+                    window.location.href = `/company_documents?edit=${id}&sr_no=${encodeURIComponent(doc.sr_no)}&document_name=${encodeURIComponent(doc.document_name)}&issued_on=${encodeURIComponent(doc.issued_on || '')}&valid_upto=${encodeURIComponent(doc.valid_upto || '')}&details=${encodeURIComponent(doc.details || '')}`;
+                } else {
+                    alert('Failed to fetch document for modification: ' + (doc.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error fetching document for modification: ' + error.message);
+            }
+        }
+
+        // Download document
+        function downloadDocument(id) {
+            window.location.href = `/api/company_documents/download/${id}`;
+        }
+
+        // Load all documents
+        async function loadDocuments() {
+            try {
+                const response = await fetch('/api/company_documents');
+                const documents = await response.json();
+                const tbody = document.getElementById('documentsTable');
+                tbody.innerHTML = ''; // Clear existing rows
+                if (documents.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7">No documents found.</td></tr>';
+                } else {
+                    documents.forEach(doc => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${doc.sr_no}</td>
+                            <td>${doc.document_name}</td>
+                            <td>${doc.issued_on || '-'}</td>
+                            <td>${doc.valid_upto || '-'}</td>
+                            <td>${doc.details || '-'}</td>
+                            <td>${doc.file_path ? '<a href="' + doc.file_path + '" target="_blank">View File</a>' : '-'}</td>
+                            <td class="action-buttons">
+                                <button onclick="viewDocument(${doc.id})" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">View</button>
+                                <button onclick="modifyDocument(${doc.id})" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">Modify</button>
+                                <button onclick="downloadDocument(${doc.id})" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Download</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading documents:', error);
+                alert('Error loading documents: ' + error.message);
+            }
+        }
+
+        // Initialize
+        window.onload = loadDocuments;
+    </script>
+</body>
+</html>

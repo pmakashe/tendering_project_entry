@@ -13,28 +13,14 @@ from typing import Optional, List, Union, AsyncGenerator, Any
 import os
 from passlib.context import CryptContext
 
-# --- Password Hashing ---
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # --- Database Configuration ---
+DATABASE_URL = "postgresql+asyncpg://postgres:Pune123@localhost:5433/tendering_project_entry_db"
+engine = create_async_engine(DATABASE_URL, echo=True)
+AsyncSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
+
 Base = declarative_base()
-
-# Load DATABASE_URL from environment (Render provides it)
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:Pune123@localhost:5433/tendering_project_entry_db")
-
-# Ensure asyncpg driver is used
-if DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
-
-# Add SSL mode for Render's PostgreSQL
-if "sslmode" not in DATABASE_URL:
-    DATABASE_URL += "?sslmode=require"
-
-# Create async engine
-engine = create_async_engine(DATABASE_URL, echo=True)  # echo=True for debug logs
-
-# Create async session factory
-async_session = async_sessionmaker(engine, class_=AsyncSession, autocommit=False, autoflush=False, expire_on_commit=False)
 
 # --- Database Models ---
 class User(Base):
@@ -134,23 +120,30 @@ class DailyWorkEntry(Base):
     remark = Column(Text)
     __table_args__ = (UniqueConstraint('sr_no', 'project_id', name='_sr_no_project_uc'),)
 
-class Tender(Base):
-    __tablename__ = "tenders"
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    description = Column(String)
+class CompanyDocument(Base):
+    __tablename__ = "company_documents"
+    id = Column(Integer, primary_key=True, index=True)
+    sr_no = Column(Integer, nullable=False)
+    document_name = Column(String(255), nullable=False)
+    issued_on = Column(Date, nullable=True)
+    valid_upto = Column(Date, nullable=True)
+    details = Column(Text, nullable=True)
+    file_path = Column(String(500), nullable=True)
+    modified = Column(Boolean, default=False)  # Track if document is modified
+    revision = Column(Integer, default=0)     # Track revision number
+    __table_args__ = (UniqueConstraint('sr_no', name='_sr_no_uc'),)
 
 # --- FastAPI App Setup ---
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-UPLOAD_DIRECTORY = "/tmp/uploaded_documents"  # Use /tmp for Render's ephemeral filesystem
+UPLOAD_DIRECTORY = "uploaded_documents"
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 # --- Database Session Dependency ---
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with async_session() as session:
+    async with AsyncSessionLocal() as session:
         yield session
         await session.close()
 
@@ -212,27 +205,12 @@ def parse_boolean_or_none(value_str: Optional[Union[str, bool]]) -> Optional[boo
             return False
     return None
 
-# --- Startup Event for Schema Initialization ---
+# --- Routes ---
 @app.on_event("startup")
 async def on_startup():
     async with engine.begin() as conn:
-        try:
-            await conn.run_sync(Base.metadata.create_all)
-            print("Database schema initialized successfully")
-        except Exception as e:
-            print(f"Failed to initialize database schema: {e}")
-            raise
+        await conn.run_sync(Base.metadata.create_all)
 
-    # Test database connection
-    async with async_session() as session:
-        try:
-            await session.execute("SELECT 1")
-            print("Database connection successful")
-        except Exception as e:
-            print(f"Database connection failed: {e}")
-            raise
-
-# --- Routes ---
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("signin.html", {"request": request})
@@ -407,7 +385,7 @@ async def get_all_projects_api(
                 project_dict[col.name] = str(value)
             elif isinstance(value, (date, datetime)):
                 if col.name == "tender_entry_date":
-                    project_dict[col.name] = value.isoformat(timespec='minutes') if value is not None else None
+                     project_dict[col.name] = value.isoformat(timespec='minutes') if value is not None else None
                 else:
                     project_dict[col.name] = value.isoformat() if value is not None else None
             else:
@@ -634,7 +612,7 @@ async def get_external_tenders_api(
         if search_query:
             query_lower = search_query.lower()
             if not (query_lower in tender["tender_id_external"].lower() or \
-                    query_lower in tender["tender_ref_number"].lower() or \
+                    query_query in tender["tender_ref_number"].lower() or \
                     query_lower in tender["tender_title"].lower() or \
                     query_lower in tender["other_details"].lower()):
                 match = False
@@ -751,7 +729,7 @@ async def add_external_tender_to_internal_projects(
     except Exception as e:
         await db.rollback()
         if "UniqueConstraint" in str(e):
-            raise HTTPException(status_code=409, detail=f"A project with external ID '{tender_id_external}' or similar Project ID already exists.")
+             raise HTTPException(status_code=409, detail=f"A project with external ID '{tender_id_external}' or similar Project ID already exists.")
         raise HTTPException(status_code=500, detail=f"Failed to add tender to internal projects: {e}")
 
 @app.get("/new_project", response_class=HTMLResponse)
@@ -783,10 +761,10 @@ async def new_tender_entry_form_page(request: Request, db: AsyncSession = Depend
     current_datetime_str = datetime.now().isoformat(timespec='minutes')
 
     return templates.TemplateResponse(
-        "new_tender_entry_form.html",
-        {"request": request, "next_project_id": next_project_id, "current_datetime_str": current_datetime_str},
-        status_code=status.HTTP_200_OK
-    )
+            "new_tender_entry_form.html",
+            {"request": request, "next_project_id": next_project_id, "current_datetime_str": current_datetime_str},
+            status_code=status.HTTP_200_OK
+        )
 
 @app.get("/daily_work_entry_form", response_class=HTMLResponse)
 async def daily_work_entry_form_page(request: Request):
@@ -1129,7 +1107,7 @@ async def get_daily_work_summary(
             query = query.filter(DailyWorkEntry.allocation_date <= end_date)
 
         result = await db.execute(query)
-        daily_entries = result.fetchall()
+        daily_entries = result.fetchall()  # Use fetchall to handle empty results
 
         total_completed = 0
         total_not_started = 0
@@ -1145,7 +1123,7 @@ async def get_daily_work_summary(
         tasks_by_project = defaultdict(lambda: {"Completed": 0, "In Progress": 0, "Not Started": 0})
 
         for entry in daily_entries:
-            entry_data = entry._mapping if hasattr(entry, '_mapping') else entry
+            entry_data = entry._mapping if hasattr(entry, '_mapping') else entry  # Handle SQLAlchemy result compatibility
             if entry_data.status_summary == "Completed":
                 total_completed += 1
             elif entry_data.status_summary == "Not Started":
@@ -1185,6 +1163,7 @@ async def get_daily_work_summary(
                 {
                     "project_id": entry_data.project_id,
                     "name_of_project": entry_data.name_of_project or 'N/A',
+                    "activity_name": entry_data.activity_name or 'N/A',
                     "status_summary": entry_data.status_summary or 'Not Started',
                     "due_date": entry_data.due_date.isoformat() if entry_data.due_date else None,
                     "completed_on": entry_data.completed_on.isoformat() if entry_data.completed_on else None,
@@ -1229,3 +1208,134 @@ async def projects_page(request: Request):
 @app.get("/all_tasks", response_class=HTMLResponse)
 async def all_tasks_page(request: Request):
     return templates.TemplateResponse("all_tasks.html", {"request": request})
+
+@app.get("/company_documents", response_class=HTMLResponse)
+async def company_documents_page(request: Request):
+    current_year = datetime.now().year
+    return templates.TemplateResponse("company_documents.html", {"request": request, "current_year": current_year})
+
+@app.get("/all_documents", response_class=HTMLResponse)
+async def all_documents_page(request: Request):
+    current_year = datetime.now().year
+    return templates.TemplateResponse("all_documents.html", {"request": request, "current_year": current_year})
+
+@app.get("/api/company_documents", response_class=JSONResponse)
+async def get_company_documents(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(CompanyDocument))
+    documents = result.scalars().all()
+    documents_data = [
+        {
+            "id": doc.id,
+            "sr_no": doc.sr_no,
+            "document_name": doc.document_name,
+            "issued_on": doc.issued_on.isoformat() if doc.issued_on else None,
+            "valid_upto": doc.valid_upto.isoformat() if doc.valid_upto else None,
+            "details": doc.details,
+            "file_path": f"/static/{os.path.basename(doc.file_path)}" if doc.file_path and os.path.exists(doc.file_path) else None,
+            "modified": doc.modified,
+            "revision": doc.revision
+        } for doc in documents
+    ]
+    return JSONResponse(content=documents_data)
+
+@app.post("/api/company_documents", response_class=JSONResponse)
+async def create_company_document(
+    request: Request,
+    sr_no: int = Form(...),
+    document_name: str = Form(...),
+    issued_on_str: Optional[str] = Form(None),
+    valid_upto_str: Optional[str] = Form(None),
+    details: Optional[str] = Form(None),
+    file: Optional[UploadFile] = File(None),
+    db: AsyncSession = Depends(get_db)
+):
+    issued_on = parse_date_or_none(issued_on_str) if issued_on_str else None
+    valid_upto = parse_date_or_none(valid_upto_str) if valid_upto_str else None
+    file_path = None
+
+    if file and file.filename:
+        file_location = os.path.join(UPLOAD_DIRECTORY, file.filename)
+        os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
+        try:
+            with open(file_location, "wb+") as file_object:
+                file_object.write(await file.read())
+            file_path = file_location
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to save file: {e}")
+
+    new_document = CompanyDocument(
+        sr_no=sr_no,
+        document_name=document_name,
+        issued_on=issued_on,
+        valid_upto=valid_upto,
+        details=details,
+        file_path=file_path,
+        modified=False,
+        revision=0
+    )
+    db.add(new_document)
+    try:
+        await db.commit()
+        await db.refresh(new_document)
+        return JSONResponse(content={"message": f"Document '{document_name}' created successfully!", "id": new_document.id})
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to create document: {e}")
+
+@app.put("/api/company_documents/{document_id}", response_class=JSONResponse)
+async def update_company_document(
+    document_id: int,
+    request: Request,
+    sr_no: int = Form(...),
+    document_name: str = Form(...),
+    issued_on_str: Optional[str] = Form(None),
+    valid_upto_str: Optional[str] = Form(None),
+    details: Optional[str] = Form(None),
+    file: Optional[UploadFile] = File(None),
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(select(CompanyDocument).filter(CompanyDocument.id == document_id))
+    document = result.scalars().first()
+    if not document:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    issued_on = parse_date_or_none(issued_on_str) if issued_on_str else document.issued_on
+    valid_upto = parse_date_or_none(valid_upto_str) if valid_upto_str else document.valid_upto
+    original_document_name = document.document_name
+    original_issued_on = document.issued_on
+    original_valid_upto = document.valid_upto
+    original_details = document.details
+    original_file_path = document.file_path
+
+    if file and file.filename:
+        file_location = os.path.join(UPLOAD_DIRECTORY, file.filename)
+        os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
+        try:
+            with open(file_location, "wb+") as file_object:
+                file_object.write(await file.read())
+            document.file_path = file_location
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to save file: {e}")
+
+    document.sr_no = sr_no
+    document.document_name = document_name
+    document.issued_on = issued_on
+    document.valid_upto = valid_upto
+    document.details = details
+
+    # Check if any field has changed to set modified and increment revision
+    if (document_name != original_document_name or
+        issued_on != original_issued_on or
+        valid_upto != original_valid_upto or
+        details != original_details or
+        (file and file.filename and file_path != original_file_path)):
+        document.modified = True
+        document.revision += 1
+
+    try:
+        await db.commit()
+        await db.refresh(document)
+        return JSONResponse(content={"message": f"Document '{document_name}' updated successfully!", "id": document.id, "modified": document.modified, "revision": document.revision})
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to update document: {e}")

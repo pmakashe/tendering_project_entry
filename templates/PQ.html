@@ -1,0 +1,889 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script>```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prequalification Dashboard - Tendering Project Entry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" crossorigin="anonymous">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f4f7f6;
+            padding-top: 56px;
+        }
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1030;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .main-content {
+            flex: 1;
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+        .navbar {
+            background-color: #28a745;
+            padding: 8px 0;
+            box-shadow: none;
+        }
+        .navbar-brand {
+            color: white !important;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .navbar-nav .nav-link {
+            color: white !important;
+            margin-left: 10px;
+            font-size: 1rem;
+        }
+        .navbar-nav .nav-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            margin-top: auto;
+            font-size: 0.85rem;
+        }
+        .card-dashboard {
+            border-left: 5px solid;
+            border-radius: .35rem;
+            margin-bottom: 10px;
+            box-shadow: 0 0.05rem 0.75rem 0 rgba(58, 59, 69, 0.1) !important;
+        }
+        .card-body-dashboard {
+            padding: 0.8rem;
+        }
+        .text-xs {
+            font-size: .6rem;
+        }
+        .font-weight-bold {
+            font-weight: 700 !important;
+        }
+        .text-uppercase {
+            text-transform: uppercase !important;
+        }
+        .mb-1 {
+            margin-bottom: .15rem !important;
+        }
+        .h5 {
+            font-size: 1.05rem;
+        }
+        .mb-0 {
+            margin-bottom: 0 !important;
+        }
+        .icon-circle {
+            height: 2rem;
+            width: 2rem;
+            border-radius: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bg-primary { background-color: #007bff !important; }
+        .bg-success { background-color: #28a745 !important; }
+        .bg-info { background-color: #17a2b8 !important; }
+        .bg-warning { background-color: #ffc107 !important; }
+        .text-primary { color: #007bff !important; }
+        .text-success { color: #28a745 !important; }
+        .text-info { color: #17a2b8 !important; }
+        .text-warning { color: #ffc107 !important; }
+        .chart-container-wrapper {
+            height: 180px;
+            max-height: 180px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0;
+        }
+        canvas {
+            max-height: 100%;
+            max-width: 100%;
+        }
+        .chart-card-body {
+            padding: 0.8rem;
+        }
+        .card .card-header {
+            padding: 0.5rem 0.8rem;
+        }
+        .card .card-header h6 {
+            font-size: 0.9rem;
+        }
+        .container-fluid.py-4 {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .row.mt-2.g-3 {
+            margin-top: 10px !important;
+            margin-bottom: 0 !important;
+        }
+        .col-lg-6.col-md-12.mb-2 {
+            margin-bottom: 10px !important;
+        }
+        .row {
+            margin-right: -5px;
+            margin-left: -5px;
+        }
+        .row > .col, .row > [class*="col-"] {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+        .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .table th, .table td {
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.4em 0.6em;
+        }
+        .expandable-row {
+            cursor: pointer;
+        }
+        .sub-table {
+            display: none;
+            background-color: #f8f9fa;
+            padding: 10px;
+        }
+        .action-checkbox {
+            margin-right: 5px;
+        }
+        .editable-cell {
+            cursor: text;
+        }
+        .editable-cell:hover {
+            background-color: #f0f0f0;
+        }
+        @media (max-width: 576px) {
+            .table th, .table td {
+                font-size: 0.75rem;
+            }
+            .card-body-dashboard {
+                padding: 0.5rem;
+            }
+            .chart-container-wrapper {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/landing_page">Tendering Project Entry</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/project_dashboard">Project Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/new_project">New Project Entry</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/projects_list">Projects List</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                More
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/reports">Reports</a></li>
+                                <li><a class="dropdown-item" href="/analytics">Analytics</a></li>
+                                <li><a class="dropdown-item" href="/user_management">User Management</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/signin">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="container-fluid py-4">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Prequalification Dashboard</h1>
+                <a href="/projects_list" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                    <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Projects
+                </a>
+            </div>
+
+            <!-- Tender Overview Section -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-1">
+                    <h6 class="m-0 font-weight-bold text-primary">Tender Overview</h6>
+                </div>
+                <div class="card-body card-body-dashboard">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Project ID:</strong> <span id="projectId">PID-2025-001</span></p>
+                            <p><strong>Tender Name:</strong> <span id="tenderName">Loading...</span></p>
+                            <p><strong>Est. Cost (INR):</strong> <span id="estCost">Loading...</span></p>
+                            <p><strong>Est. Cost (INR Cr):</strong> <span id="estCostCr">Loading...</span></p>
+                            <p><strong>Tender ID:</strong> <input type="text" id="tenderIdInput" class="form-control form-control-sm" value="17 for 2025-26"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Name of Client:</strong> <span id="clientName">Loading...</span></p>
+                            <p><strong>EMD Cost:</strong> <span id="emdCost">Loading...</span></p>
+                            <p><strong>Completion Time:</strong> <span id="completionTime">Loading...</span></p>
+                            <p><strong>Pre-bid Meeting:</strong> <span id="preBidMeeting">Loading...</span></p>
+                            <p><strong>Location:</strong> <input type="text" id="locationInput" class="form-control form-control-sm" value="Mumbai Railway Vikas Corporation Ltd., Mumbai"></p>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-sm mt-2" onclick="alert('Tender document download not implemented yet.')">
+                        <i class="fas fa-download"></i> Download Tender Document
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pre-Qualification Criteria Table -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-1 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Pre-Qualification Criteria</h6>
+                    <div>
+                        <select id="statusFilter" class="form-select form-select-sm" aria-label="Filter by status">
+                            <option value="all">All</option>
+                            <option value="Qualify">Qualified</option>
+                            <option value="Not Qualify">Not Qualified</option>
+                            <option value="Support Require">Support Required</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <button class="btn btn-success btn-sm ms-2" id="addRowBtn"><i class="fas fa-plus"></i> Add Row</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="prequalTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Sr. No.</th>
+                                    <th scope="col">Clause No. & Page</th>
+                                    <th scope="col">Particular</th>
+                                    <th scope="col">Tender Requirement</th>
+                                    <th scope="col">Our Credential</th>
+                                    <th scope="col">Remark</th>
+                                    <th scope="col">Our Request</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prequalTableBody">
+                                <!-- Data populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Metrics and Action Items -->
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header py-1">
+                            <h6 class="m-0 font-weight-bold text-primary">Key Metrics</h6>
+                        </div>
+                        <div class="card-body card-body-dashboard">
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Qualified</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="qualifiedCount">0</div>
+                                    <span class="badge bg-success text-white">Criteria Met</span>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Not Qualified</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="notQualifiedCount">0</div>
+                                    <span class="badge bg-danger text-white">Action Needed</span>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Support Required</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="supportRequiredCount">0</div>
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Other</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="otherCount">0</div>
+                                    <span class="badge bg-info text-white">Review</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header py-1">
+                            <h6 class="m-0 font-weight-bold text-primary">Action Items & Documents</h6>
+                        </div>
+                        <div class="card-body card-body-dashboard">
+                            <div class="mb-3">
+                                <label for="actionInput" class="form-label">Add Action Item</label>
+                                <div class="input-group">
+                                    <input type="text" id="actionInput" class="form-control form-control-sm" placeholder="e.g., Register on IREPS">
+                                    <button class="btn btn-primary btn-sm" id="addActionBtn"><i class="fas fa-plus"></i></button>
+                                </div>
+                            </div>
+                            <ul class="list-group list-group-flush" id="actionList">
+                                <!-- Actions populated by JavaScript -->
+                            </ul>
+                            <div class="mt-3">
+                                <p><strong>Documents:</strong></p>
+                                <div id="documentLinks">
+                                    <!-- Documents populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="row mt-2 g-2">
+                <div class="col-lg-6 col-md-12 mb-2">
+                    <div class="card shadow">
+                        <div class="card-header py-1">
+                            <h6 class="m-0 font-weight-bold text-primary">Financial Turnover Comparison</h6>
+                        </div>
+                        <div class="card-body chart-card-body">
+                            <div class="chart-container-wrapper" style="height: 180px;">
+                                <canvas id="turnoverChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 mb-2">
+                    <div class="card shadow">
+                        <div class="card-header py-1">
+                            <h6 class="m-0 font-weight-bold text-primary">Project Completion Percentage</h6>
+                        </div>
+                        <div class="card-body chart-card-body">
+                            <div class="chart-container-wrapper" style="height: 180px;">
+                                <canvas id="completionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 mb-2">
+                    <div class="card shadow">
+                        <div class="card-header py-1">
+                            <h6 class="m-0 font-weight-bold text-primary">Graph 3 (Placeholder)</h6>
+                        </div>
+                        <div class="card-body chart-card-body">
+                            <div class="chart-container-wrapper" style="height: 180px;">
+                                <p class="text-center text-muted mt-5">Content for Graph 3 will go here.</p>
+                                <canvas id="graph3Chart" style="display: none;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 mb-2">
+                    <div class="card shadow">
+                        <div class="card-header py-1">
+                            <h6 class="m-0 font-weight-bold text-primary">Graph 4 (Placeholder)</h6>
+                        </div>
+                        <div class="card-body chart-card-body">
+                            <div class="chart-container-wrapper" style="height: 180px;">
+                                <p class="text-center text-muted mt-5">Content for Graph 4 will go here.</p>
+                                <canvas id="graph4Chart" style="display: none;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Tendering Project Entry. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Static data for demo (replace with API calls)
+            const prequalData = [
+                {
+                    sr_no: 1,
+                    clause: "ITB 4.1/54",
+                    particular: "Joint Venture Allowed or Not",
+                    requirement: "",
+                    credential: "",
+                    remark: "",
+                    request: "",
+                    expandable: []
+                },
+                {
+                    sr_no: 2,
+                    clause: "3-e",
+                    particular: "Registrations",
+                    requirement: "Registration on IREPS website is mandatory",
+                    credential: "Need to register",
+                    remark: "Support Require",
+                    request: "",
+                    expandable: []
+                },
+                {
+                    sr_no: 3,
+                    clause: "2.2 (pg 63)",
+                    particular: "Financial Turnover",
+                    requirement: "Average 3 years turnover ₹39.99 Cr",
+                    credential: "₹125.81 Cr",
+                    remark: "Qualify",
+                    request: "",
+                    expandable: []
+                },
+                {
+                    sr_no: 4,
+                    clause: "",
+                    particular: "Qualification for Civil Work",
+                    requirement: "",
+                    credential: "",
+                    remark: "",
+                    request: "",
+                    expandable: [
+                        {
+                            sub_particular: "Similar Work Definition",
+                            requirement: "Construction of Multistoried building",
+                            credential: "Metro Project G + 2 Buildings",
+                            remark: "Qualify",
+                            request: ""
+                        },
+                        {
+                            sub_particular: "One work (80% of estimated)",
+                            requirement: "₹59.98 Cr",
+                            credential: "Metro 1to 6 - ₹104 Cr, 16.07.2020",
+                            remark: "Qualify",
+                            request: ""
+                        }
+                    ]
+                }
+            ];
+
+            let tableData = [...prequalData];
+            let srNoCounter = tableData.length + 1;
+
+            // Fetch project data (placeholder)
+            function fetchProjectData(projectId) {
+                fetch(`/api/projects/${projectId}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to fetch project data');
+                        return response.json();
+                    })
+                    .then(data => {
+                        document.getElementById('projectId').textContent = data.project_id;
+                        document.getElementById('tenderName').textContent = data.project_name;
+                        document.getElementById('estCost').textContent = `₹${parseFloat(data.tender_estimated_cost_inr || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                        document.getElementById('estCostCr').textContent = `₹${(parseFloat(data.tender_estimated_cost_inr || 0) / 10000000).toFixed(2)} Cr`;
+                        document.getElementById('clientName').textContent = data.name_of_client || 'N/A';
+                        document.getElementById('emdCost').textContent = `₹${parseFloat(data.emd_required_inr || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                        document.getElementById('completionTime').textContent = data.tender_submission_date || 'N/A';
+                        document.getElementById('preBidMeeting').textContent = data.pre_bid_meeting_date || 'N/A';
+                    })
+                    .catch(error => {
+                        console.error('Error fetching project data:', error);
+                        const errorDiv = document.createElement('div');
+                        errorDiv.classList.add('alert', 'alert-danger', 'mt-3');
+                        errorDiv.textContent = 'Failed to load project data. Please try again later.';
+                        document.querySelector('.container-fluid.py-4').prepend(errorDiv);
+                    });
+            }
+
+            // Fetch documents
+            function fetchDocuments() {
+                fetch('/api/company_documents')
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to fetch documents');
+                        return response.json();
+                    })
+                    .then(data => {
+                        const docLinks = document.getElementById('documentLinks');
+                        const relevantDocs = data.filter(doc => doc.document_name.includes('Solvency') || doc.document_name.includes('Networth'));
+                        docLinks.innerHTML = relevantDocs.length ? relevantDocs.map(doc => `
+                            <a href="/api/company_documents/download/${doc.id}" class="text-primary me-2">${doc.document_name} (${doc.issued_on || 'N/A'})</a>
+                        `).join('') : '<p class="text-muted">No documents available.</p>';
+                    })
+                    .catch(error => {
+                        console.error('Error fetching documents:', error);
+                        document.getElementById('documentLinks').innerHTML = '<p class="text-muted">Failed to load documents.</p>';
+                    });
+            }
+
+            // Populate table
+            function populateTable(data) {
+                const tbody = document.getElementById('prequalTableBody');
+                tbody.innerHTML = '';
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = item.expandable.length ? 'expandable-row' : '';
+                    row.dataset.status = item.remark || 'all';
+                    row.dataset.srNo = item.sr_no;
+                    row.innerHTML = `
+                        <td>${item.expandable.length ? '<i class="fas fa-chevron-right"></i> ' : ''}${item.sr_no}</td>
+                        <td class="editable-cell" data-field="clause">${item.clause}</td>
+                        <td class="editable-cell" data-field="particular">${item.particular}</td>
+                        <td class="editable-cell" data-field="requirement">${item.requirement}</td>
+                        <td class="editable-cell" data-field="credential">${item.credential}</td>
+                        <td>
+                            <select class="form-select form-select-sm remark-select" data-sr-no="${item.sr_no}">
+                                <option value="" ${!item.remark ? 'selected' : ''}></option>
+                                <option value="Qualify" ${item.remark === 'Qualify' ? 'selected' : ''}>Qualify</option>
+                                <option value="Not Qualify" ${item.remark === 'Not Qualify' ? 'selected' : ''}>Not Qualify</option>
+                                <option value="Support Require" ${item.remark === 'Support Require' ? 'selected' : ''}>Support Require</option>
+                                <option value="Other" ${item.remark === 'Other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </td>
+                        <td class="editable-cell" data-field="request">${item.request}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm delete-row" data-sr-no="${item.sr_no}"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+
+                    if (item.expandable.length) {
+                        const subRow = document.createElement('tr');
+                        subRow.className = 'sub-table';
+                        subRow.dataset.status = item.remark || 'all';
+                        subRow.innerHTML = `
+                            <td colspan="8">
+                                <table class="table table-sm mb-0">
+                                    <tbody>
+                                        ${item.expandable.map((sub, index) => `
+                                            <tr>
+                                                <td class="editable-cell" data-field="sub_particular_${index}">${sub.sub_particular}</td>
+                                                <td class="editable-cell" data-field="sub_requirement_${index}">${sub.requirement}</td>
+                                                <td class="editable-cell" data-field="sub_credential_${index}">${sub.credential}</td>
+                                                <td>
+                                                    <select class="form-select form-select-sm remark-select" data-sr-no="${item.sr_no}" data-sub-index="${index}">
+                                                        <option value="" ${!sub.remark ? 'selected' : ''}></option>
+                                                        <option value="Qualify" ${sub.remark === 'Qualify' ? 'selected' : ''}>Qualify</option>
+                                                        <option value="Not Qualify" ${sub.remark === 'Not Qualify' ? 'selected' : ''}>Not Qualify</option>
+                                                        <option value="Support Require" ${sub.remark === 'Support Require' ? 'selected' : ''}>Support Require</option>
+                                                        <option value="Other" ${sub.remark === 'Other' ? 'selected' : ''}>Other</option>
+                                                    </select>
+                                                </td>
+                                                <td class="editable-cell" data-field="sub_request_${index}">${sub.request || ''}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                                <button class="btn btn-primary btn-sm mt-2 add-sub-row" data-sr-no="${item.sr_no}">Add Sub-Criterion</button>
+                            </td>
+                        `;
+                        tbody.appendChild(subRow);
+                    }
+                });
+                updateMetrics();
+            }
+
+            // Update key metrics
+            function updateMetrics() {
+                const counts = { 'Qualify': 0, 'Not Qualify': 0, 'Support Require': 0, 'Other': 0 };
+                tableData.forEach(item => {
+                    if (item.remark) counts[item.remark]++;
+                    item.expandable.forEach(sub => { if (sub.remark) counts[sub.remark]++; });
+                });
+                document.getElementById('qualifiedCount').textContent = counts['Qualify'];
+                document.getElementById('notQualifiedCount').textContent = counts['Not Qualify'];
+                document.getElementById('supportRequiredCount').textContent = counts['Support Require'];
+                document.getElementById('otherCount').textContent = counts['Other'];
+            }
+
+            // Filter table
+            document.getElementById('statusFilter').addEventListener('change', function() {
+                const filter = this.value;
+                const rows = document.querySelectorAll('#prequalTableBody tr:not(.sub-table)');
+                rows.forEach(row => {
+                    const status = row.dataset.status || 'all';
+                    row.style.display = filter === 'all' || filter === status ? '' : 'none';
+                    const nextSubRow = row.nextElementSibling;
+                    if (nextSubRow && nextSubRow.classList.contains('sub-table')) {
+                        nextSubRow.style.display = row.style.display;
+                    }
+                });
+            });
+
+            // Toggle expandable rows
+            document.getElementById('prequalTable').addEventListener('click', function(e) {
+                const row = e.target.closest('.expandable-row');
+                if (row && !e.target.closest('.editable-cell, .remark-select, .delete-row, .add-sub-row')) {
+                    const nextRow = row.nextElementSibling;
+                    if (nextRow && nextRow.classList.contains('sub-table')) {
+                        nextRow.style.display = nextRow.style.display === 'none' ? '' : 'none';
+                        row.cells[0].innerHTML = nextRow.style.display === '' ? `<i class="fas fa-chevron-down"></i> ${row.dataset.srNo}` : row.dataset.srNo;
+                    }
+                }
+            });
+
+            // Editable cells
+            document.getElementById('prequalTable').addEventListener('click', function(e) {
+                const cell = e.target.closest('.editable-cell');
+                if (cell) {
+                    const field = cell.dataset.field;
+                    const srNo = cell.closest('tr').dataset.srNo;
+                    const subIndex = cell.closest('tr').querySelector('.remark-select')?.dataset.subIndex;
+                    const currentValue = cell.textContent;
+                    const input = document.createElement(subIndex ? 'input' : 'textarea');
+                    input.className = 'form-control form-control-sm';
+                    input.value = currentValue;
+                    cell.innerHTML = '';
+                    cell.appendChild(input);
+                    input.focus();
+                    input.addEventListener('blur', function() {
+                        cell.textContent = input.value;
+                        if (subIndex !== undefined) {
+                            const item = tableData.find(item => item.sr_no == srNo);
+                            item.expandable[subIndex][field.split('_')[1]] = input.value;
+                        } else {
+                            const item = tableData.find(item => item.sr_no == srNo);
+                            item[field] = input.value;
+                        }
+                    });
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') input.blur();
+                    });
+                }
+            });
+
+            // Remark dropdown
+            document.getElementById('prequalTable').addEventListener('change', function(e) {
+                if (e.target.classList.contains('remark-select')) {
+                    const srNo = e.target.dataset.srNo;
+                    const subIndex = e.target.dataset.subIndex;
+                    const item = tableData.find(item => item.sr_no == srNo);
+                    if (subIndex !== undefined) {
+                        item.expandable[subIndex].remark = e.target.value;
+                    } else {
+                        item.remark = e.target.value;
+                        item.status = e.target.value || 'all';
+                        const row = e.target.closest('tr');
+                        row.dataset.status = item.status;
+                    }
+                    updateMetrics();
+                }
+            });
+
+            // Add new row
+            document.getElementById('addRowBtn').addEventListener('click', function() {
+                tableData.push({
+                    sr_no: srNoCounter++,
+                    clause: "",
+                    particular: "New Criterion",
+                    requirement: "",
+                    credential: "Enter credential",
+                    remark: "",
+                    request: "",
+                    expandable: []
+                });
+                populateTable(tableData);
+            });
+
+            // Delete row
+            document.getElementById('prequalTable').addEventListener('click', function(e) {
+                if (e.target.closest('.delete-row')) {
+                    const srNo = e.target.closest('.delete-row').dataset.srNo;
+                    tableData = tableData.filter(item => item.sr_no != srNo);
+                    populateTable(tableData);
+                }
+            });
+
+            // Add sub-criterion
+            document.getElementById('prequalTable').addEventListener('click', function(e) {
+                if (e.target.closest('.add-sub-row')) {
+                    const srNo = e.target.closest('.add-sub-row').dataset.srNo;
+                    const item = tableData.find(item => item.sr_no == srNo);
+                    item.expandable.push({
+                        sub_particular: "New Sub-Criterion",
+                        requirement: "",
+                        credential: "",
+                        remark: "",
+                        request: ""
+                    });
+                    populateTable(tableData);
+                }
+            });
+
+            // Add action item
+            document.getElementById('addActionBtn').addEventListener('click', function() {
+                const input = document.getElementById('actionInput');
+                if (input.value.trim()) {
+                    const list = document.getElementById('actionList');
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    const id = `action${list.children.length + 1}`;
+                    li.innerHTML = `
+                        <input type="checkbox" class="action-checkbox" id="${id}">
+                        <label for="${id}">${input.value}</label>
+                        <span class="badge bg-danger text-white float-end">Pending</span>
+                    `;
+                    list.appendChild(li);
+                    input.value = '';
+                    li.querySelector('.action-checkbox').addEventListener('change', function() {
+                        const badge = this.parentElement.querySelector('.badge');
+                        badge.textContent = this.checked ? 'Completed' : 'Pending';
+                        badge.className = `badge ${this.checked ? 'bg-success text-white' : 'bg-danger text-white'} float-end`;
+                    });
+                }
+            });
+
+            // Render Charts
+            function renderTurnoverChart() {
+                const ctx = document.getElementById('turnoverChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Required', 'Univastu'],
+                        datasets: [{
+                            label: 'Financial Turnover (₹ Cr)',
+                            data: [39.99, 125.81],
+                            backgroundColor: ['#ffc107', '#28a745'],
+                            borderColor: ['#e0a800', '#218838'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₹' + value.toLocaleString('en-IN') + ' Cr';
+                                    },
+                                    font: { size: 10 }
+                                }
+                            },
+                            x: { ticks: { font: { size: 10 } } }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `₹${context.parsed.y.toLocaleString('en-IN')} Cr`;
+                                    }
+                                },
+                                bodyFont: { size: 10 },
+                                titleFont: { size: 10 },
+                                padding: 6
+                            }
+                        },
+                        layout: { padding: { left: 5, right: 5, top: 5, bottom: 5 } }
+                    }
+                });
+            }
+
+            function renderCompletionChart() {
+                const ctx = document.getElementById('completionChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Completed', 'Remaining'],
+                        datasets: [{
+                            data: [82, 18],
+                            backgroundColor: ['#28a745', '#e0e0e0'],
+                            hoverBackgroundColor: ['#218838', '#bdbdbd'],
+                            hoverBorderColor: "rgba(234, 236, 244, 1)"
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                align: 'start',
+                                labels: { boxWidth: 10, padding: 8, font: { size: 10 } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.label}: ${context.parsed}%`;
+                                    }
+                                },
+                                bodyFont: { size: 10 },
+                                titleFont: { size: 10 },
+                                padding: 6
+                            }
+                        },
+                        cutout: '80%',
+                        layout: { padding: { left: 5, right: 5, top: 5, bottom: 5 } }
+                    }
+                });
+            }
+
+            // Initialize
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('project_id') || 'PID-2025-001';
+            fetchProjectData(projectId);
+            fetchDocuments();
+            populateTable(tableData);
+            renderTurnoverChart();
+            renderCompletionChart();
+        });
+    </script>
+</body>
+</html>
+```

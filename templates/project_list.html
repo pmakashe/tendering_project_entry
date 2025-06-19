@@ -85,7 +85,7 @@
                         <td class="p-3">${project.tender_entry_date ? new Date(project.tender_entry_date).toLocaleDateString() : 'N/A'}</td>
                         <td class="p-3">${project.tender_status || 'N/A'}</td>
                         <td class="p-3">
-                            <button onclick="openPrequalificationForm('${project.project_id}')" class="text-blue-500 hover:underline">Prequalification</button>
+                            <button onclick="PQ('${project.project_id}')" class="text-blue-500 hover:underline">PQ</button>
                         </td>
                     `;
                     tbody.appendChild(row);
